@@ -22,5 +22,7 @@ spring:
 logging:
   level:
     root: INFO
+    com:
+      example: DEBUG
     org.hibernate.SQL: DEBUG
     org.springframework.jdbc.datasource: DEBUG

@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://mysql:3306/sistema_vendas
+    url: jdbc:mysql://localhost:3306/sistema_vendas
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -24,7 +24,7 @@ logging:
   level:
     root: INFO
     org.hibernate.SQL: DEBUG
-    org.springframework.jdbc.datasource: DEBUG    
+    org.springframework.jdbc.datasource: DEBUG   
 
 secret:
   jwt:

@@ -9,5 +9,10 @@ class VendasApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	
+	 @Test
+	    void deveIniciarAplicacao() {
+	        VendasApplication.main(new String[] {});
+	    }
 
 }
