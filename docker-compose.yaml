@@ -4,7 +4,7 @@ services:
   mysql:
     build:
       context: ./db
-    container_name: mysql
+    container_name: sistema_vendas_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
@@ -22,7 +22,7 @@ services:
   back-end:
     build:
       context: ./back-end
-    container_name: back-end
+    container_name: sistema_vendas_back-end
     networks:
       - minharede
     ports:
@@ -30,14 +30,14 @@ services:
     depends_on:
       - mysql
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/sistema_so_seguros
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/sistema_vendas
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
 
   bff:
     build:
       context: ./bff
-    container_name: bff
+    container_name: sistema_vendas_bff
     networks:
       - minharede
     ports:
@@ -46,12 +46,12 @@ services:
       - back-end
     environment:
       - PORT=3000
-      - BACKEND=http://back-end:8080/api
+      - BACK_END=http://back-end:8080/api
 
   front-end:
     build:
       context: ./front-end
-    container_name: front-end
+    container_name: sistema_vendas_front-end
     networks:
       - minharede
     ports:
