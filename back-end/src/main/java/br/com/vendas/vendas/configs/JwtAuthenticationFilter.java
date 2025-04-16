@@ -26,6 +26,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    private static final List<String> PUBLIC_URLS = List.of(
+    	    "login",    	    
+    	    "swagger-ui",
+    	    "v3",
+    	    "api-docs"
+    	);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -33,12 +40,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtUtils.resolveToken(request);
+        String token = jwtUtils.resolveToken(request);        
+        
 
         try {
         if (token != null && jwtUtils.validateToken(token) && !jwtUtils.isTokenExpired(token)) {
             String username = jwtUtils.getUsernameFromToken(token);
-            String perfil = jwtUtils.getRolesFromToken(token); // Ex: "ROLE_USER"
+            String perfil = jwtUtils.getRolesFromToken(token);
 
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(perfil));
 
@@ -59,8 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/api/login"); 
+    	String path = request.getRequestURI();    	
+    	return PUBLIC_URLS.stream().anyMatch(path::contains);
     }
 
 
