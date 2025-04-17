@@ -47,7 +47,7 @@ export const validarLogin = async (body: LoginRequest) => {
     }
 }
 
-export const validarToken = async(token:any)=>{
+export const validarToken = async(token:string)=>{
     try {
         const options = {
             method: 'POST',

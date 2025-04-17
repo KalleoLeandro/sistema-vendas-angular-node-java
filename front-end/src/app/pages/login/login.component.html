@@ -1,0 +1,22 @@
+<div class="content">
+    <div class="card">
+        <div class="titulo">
+            <h1>Sistema</h1>
+            <h1>de Chamados</h1>
+        </div>
+        <div class="conteudo">
+            <form class="user" [formGroup]="loginForm">
+                <div class="form-group">
+                    <input type="text" (keyup)="change()" class="form-control form-control-user"
+                        formControlName="login" aria-describedby="emailHelp" placeholder="Login">
+                </div>
+                <div class="form-group">
+                    <input type="password" (keyup)="change()" class="form-control form-control-user"
+                    formControlName="senha" placeholder="Senha">
+                </div>                
+                <button class="btn-login" (click)="logar()">Login</button>
+                <small *ngIf="invalido" class="text-danger">Login e/ou senha inválidos</small>
+            </form>
+        </div>
+    </div>
+</div>

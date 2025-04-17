@@ -6,7 +6,8 @@
     "outDir": "./dist/out-tsc",
     "baseUrl": "src",
     "paths": {
-      "@components/*": ["app/components/*"]
+      "@components/*": ["app/components/*"],
+      "@pages/*": ["app/pages/*"]
     },
     "strict": true,
     "noImplicitOverride": true,

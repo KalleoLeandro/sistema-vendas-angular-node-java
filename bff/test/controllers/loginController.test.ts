@@ -14,33 +14,53 @@ describe('loginController', () => {
     req = {};
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
+      cookie: jest.fn()
     };
   });
 
   describe('validarLogin', () => {
-    it('retorna 200 com sucesso no login', async () => {
+    it('retorna 200 com sucesso no login e define cookie', async () => {
       (decriptografia as jest.Mock).mockReturnValue(JSON.stringify({ userName: 'user', password: 'pass' }));
-      (loginService.validarLogin as jest.Mock).mockResolvedValue({ status: 200, token: 'abc', userName: 'user', expiration: '01/01/2025' });
+      (loginService.validarLogin as jest.Mock).mockResolvedValue({
+        status: 200,
+        token: 'abc',
+        message: 'Login realizado com sucesso',
+        expiration: 3600000
+      });
 
       req.body = { hash: 'abc' };
 
       await loginController.validarLogin(req as Request, res as Response);
 
+      expect(res.cookie).toHaveBeenCalledWith("token", "abc", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 3600000
+      });
+
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ status: 200, token: 'abc', userName: 'user', expiration: '01/01/2025' });
+      expect(res.json).toHaveBeenCalledWith({
+        status: 200,
+        message: 'Login realizado com sucesso',
+        expiration: 3600000
+      });
     });
 
     it('retorna status diferente de 200 com mensagem', async () => {
       (decriptografia as jest.Mock).mockReturnValue(JSON.stringify({ userName: 'user', password: 'wrong' }));
-      (loginService.validarLogin as jest.Mock).mockResolvedValue({ status: 401, mensagem: 'Credenciais inválidas' });
+      (loginService.validarLogin as jest.Mock).mockResolvedValue({
+        status: 401,
+        message: 'Credenciais inválidas'
+      });
 
       req.body = { hash: 'hasherrado' };
 
       await loginController.validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith('Credenciais inválidas');
+      expect(res.json).toHaveBeenCalledWith({ message: 'Credenciais inválidas' });
     });
 
     it('retorna 500 em caso de erro', async () => {
@@ -52,7 +72,7 @@ describe('loginController', () => {
       await loginController.validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro: Error: Erro interno');
+      expect(res.json).toHaveBeenCalledWith('Error: Erro interno');
     });
   });
 
@@ -60,7 +80,7 @@ describe('loginController', () => {
     it('retorna 200 ao validar token com sucesso', async () => {
       (loginService.validarToken as jest.Mock).mockResolvedValue({ valido: true });
 
-      req.headers = { authorization: 'Bearer token' };
+      req.cookies = { token: 'abc' };
 
       await loginController.validarToken(req as Request, res as Response);
 
@@ -71,12 +91,12 @@ describe('loginController', () => {
     it('retorna 500 em caso de erro ao validar token', async () => {
       (loginService.validarToken as jest.Mock).mockRejectedValue(new Error('Token inválido'));
 
-      req.headers = { authorization: 'Bearer token' };
+      req.cookies = { token: 'abc' };
 
       await loginController.validarToken(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro: Error: Token inválido');
+      expect(res.json).toHaveBeenCalledWith('Error: Token inválido');
     });
   });
 });
