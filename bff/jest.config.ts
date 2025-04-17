@@ -23,6 +23,11 @@ const config: Config = {
     '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    "^@routes/(.*)$": '<rootDir>/src/routes/$1',
+    "^@errors/(.*)$": '<rootDir>/src/errors/$1',
+    "^@middlewares/(.*)$": '<rootDir>/src/middlewares/$1',
+    "^@models/(.*)$": '<rootDir>/src/models/$1',
+    "^@environments/(.*)$": '<rootDir>/src/environments/$1',
   }
 };
 

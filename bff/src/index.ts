@@ -1,9 +1,11 @@
-import routes from "@routes/routes";
 import { environments } from "environments/environments";
 import express, { Request, Response } from "express";
-import path from "path";
 import { logger } from "utils/utils";
 import { Logger } from "winston";
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { options } from "configs/swagger";
+import testeRoutes from "@routes/testeRoutes";
 
 const server = express();
 
@@ -11,11 +13,13 @@ const log:Logger = logger;
 
 server.use(express.json());
 
-server.use(express.static(path.join(__dirname, '../public')));
-
 server.use(express.urlencoded({ extended: true }));
 
-server.use(routes);
+const swaggerSpec = swaggerJSDoc(options);
+
+server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+server.use(testeRoutes);
 
 server.use((req:Request, res:Response)=>{
     res.status(404).json('Recurso não encontrado!');

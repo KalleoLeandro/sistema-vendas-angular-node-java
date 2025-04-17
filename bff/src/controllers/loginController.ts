@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-
-import { decriptografia, logger } from "utils/utils";
+import { decriptografia, logger } from "@utils/utils";
 import * as loginService from "@services/loginService";
 import { LoginRequest } from "@models/loginRequest";
 

@@ -1,12 +1,11 @@
-import { environments } from "environments/environments";
 import { createLogger, format, transports } from "winston";
+import * as forge from "node-forge";
+import { environments } from "@environments/environments";
 
 export const decriptografia = (hash: string) => {
-    const privateKeyPem = environments.PRIVATE_KEY;
+    const privateKeyPem = environments.PRIVATE_KEY as string;
 
-    const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
-
-    //const buffer = Buffer.from(hash, 'base64').toString();
+    const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);    
 
     const mensagem = privateKey.decrypt(forge.util.decode64(hash));
 

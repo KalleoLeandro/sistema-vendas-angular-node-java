@@ -1,8 +1,8 @@
+import { environments } from "@environments/environments";
+import { CustomError } from "@errors/customError";
 import { LoginResponse } from "@models/loginReponse";
 import { LoginRequest } from "@models/loginRequest";
-import { environments } from "environments/environments";
-import { CustomError } from "errors/customError";
-import { logger } from "utils/utils";
+import { logger } from "@utils/utils";
 
 const log = logger;
 
