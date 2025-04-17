@@ -1,4 +1,17 @@
+import { environments } from "environments/environments";
 import { createLogger, format, transports } from "winston";
+
+export const decriptografia = (hash: string) => {
+    const privateKeyPem = environments.PRIVATE_KEY;
+
+    const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+
+    //const buffer = Buffer.from(hash, 'base64').toString();
+
+    const mensagem = privateKey.decrypt(forge.util.decode64(hash));
+
+    return mensagem;
+}
 
 const customFormat = format.printf(({ level, message, timestamp }) => {
     return `${timestamp} [${level}]: ${message}`;
