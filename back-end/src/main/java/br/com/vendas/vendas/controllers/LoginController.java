@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.services.LoginService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Login", description = "Endpoints de login e token")
 @RestController
 @RequestMapping("/login")
 public class LoginController {	

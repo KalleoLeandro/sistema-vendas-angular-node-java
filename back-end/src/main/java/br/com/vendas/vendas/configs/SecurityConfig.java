@@ -27,7 +27,10 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth						 	                     
 						.requestMatchers("/login/validar-login", 
 								         "/login/validar-token",								         								         								         
-								         "/v3/api-docs/**",					                     
+								         "/api-docs/**",								         
+								         "/v3/api-docs.yaml",
+								         "/v3/api-docs",
+								         "/v3/api-docs/*",
 					                     "/swagger*/**",
 					                     "/webjars/**",
 					                     "/swagger-ui/**",
