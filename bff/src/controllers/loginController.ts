@@ -37,7 +37,7 @@ export const validarLogin = async (req: Request, res: Response) => {
         }
     } catch (error) {
         log.error(`Erro: ${error}`);
-        res.status(500).json(`${error}`);
+        res.status(500).json(`Erro ao validar o login`);
     }
 }
 
@@ -48,7 +48,7 @@ export const validarToken = async (req: Request, res: Response) => {
         const retorno: boolean = await loginService.validarToken(token);
         res.status(200).json(retorno);
     } catch (error) {
-        log.error(`Erro ao validar o token`);
-        res.status(500).json(`${error}`);
+        log.error(`Erro: ${error}`);
+        res.status(500).json(`Erro ao validar o token`);
     }
 }

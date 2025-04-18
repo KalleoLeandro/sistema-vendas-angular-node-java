@@ -1,4 +1,4 @@
-export const environment = {
+export const environment = { 
     BFF: '',
-    PUBLIC_KEY: ''
+    PUBLIC_KEY: ''   
 };

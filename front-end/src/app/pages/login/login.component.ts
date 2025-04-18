@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit{
   #fb = inject(FormBuilder);
   #router = inject(Router);
   #loginService = inject(LoginService);
-  public token:string = sessionStorage.getItem('authorization') as string;
+  public token:string = sessionStorage.getItem('token') as string || "";
 
   ngOnInit(): void {    
     this.#loginService.validarToken(this.token).subscribe({
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit{
     }
   }
 
-  public logar() {
+  public logar() {    
     const login = {
       login: this.loginForm.controls['login'].value,
       senha: this.loginForm.controls['senha'].value

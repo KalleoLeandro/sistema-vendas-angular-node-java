@@ -20,6 +20,5 @@ export const authGuardGuard: CanActivateFn = (route: ActivatedRouteSnapshot, sta
       sessionStorage.clear();        
       return of(router.createUrlTree(['login']));
     })
-  );
-  return true;
+  );  
 };

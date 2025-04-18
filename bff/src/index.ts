@@ -15,7 +15,7 @@ const server = express();
 const log: Logger = logger;
 
 server.use(cors({
-    origin: "http://localhost:4200",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "PATCH","DELETE"]
 }));
 

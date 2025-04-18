@@ -12,14 +12,12 @@ export class LoginService {
   #httpClient = inject(HttpClient);
   #url = signal(environment.BFF);
 
-  public validarLogin(hash: string): Observable<LoginReponse> {
+  public validarLogin(hash: string): Observable<LoginReponse> {    
     return this.#httpClient.post<LoginReponse>(`${this.#url()}/validar-login`, { hash }).pipe(
       shareReplay(),
-      catchError((error: HttpErrorResponse) => {
-        return throwError(() => {
-          error
-        })
-      })
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => error)
+      )
     )
   }
 
@@ -32,11 +30,9 @@ export class LoginService {
     }
 
     return this.#httpClient.post<Boolean>(`${this.#url()}/validar-token`, null, httpOptions).pipe(
-      catchError((error: HttpErrorResponse) => {
-        return throwError(() => {
-          error
-        })
-      })
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => error)
+      )
     );
   }
 }

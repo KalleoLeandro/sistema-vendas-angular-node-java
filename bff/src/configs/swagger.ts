@@ -19,7 +19,7 @@ export const swaggerDefinition = {
   ],
   servers: [
     {
-      url: environments.PORT,
+      url: `http://localhost:${environments.PORT}`,
     },
   ],
 };

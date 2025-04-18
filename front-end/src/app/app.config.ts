@@ -7,7 +7,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideHttpClient(),   
-    provideHttpClientTesting(),
+    provideHttpClient(),       
     provideRouter(routes)]
 };

@@ -63,7 +63,7 @@ describe('loginController', () => {
       await validarLogin(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('CustomError: Hash inválido ou ausente');
+      expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
     });
 
     it('deve retornar erro 500 quando não for possível descriptografar o hash', async () => {
@@ -81,7 +81,7 @@ describe('loginController', () => {
       await validarLogin(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('CustomError: Falha ao descriptografar o hash');
+      expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
     });
 
     it('deve retornar status 400 quando o retorno do loginService for inválido', async () => {
@@ -144,7 +144,7 @@ describe('loginController', () => {
       await validarToken(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Error: Token invalid');
+      expect(res.json).toHaveBeenCalledWith('Erro ao validar o token');
     });
   });
 });
