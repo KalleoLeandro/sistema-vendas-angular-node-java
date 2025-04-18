@@ -3,27 +3,37 @@ import { decriptografia, logger } from "@utils/utils";
 import * as loginService from "@services/loginService";
 import { LoginRequest } from "@models/loginRequest";
 import { LoginResponse } from "@models/loginReponse";
+import { CustomError } from "@errors/customError";
 
 const log = logger;
 
 export const validarLogin = async (req: Request, res: Response) => {
     try {
-        const login: LoginRequest = JSON.parse(decriptografia(req.body.hash));
-        log.info("Executando a LoginService.validarLogin")     
+        const hash: string = req.body.hash;
+
+        if (!hash) {
+            throw new CustomError("Hash inválido ou ausente", 500);
+        }
+
+        const decrypted = decriptografia(hash);
+
+        if (!decrypted) {
+            throw new CustomError("Falha ao descriptografar o hash", 500);
+        }
+
+        const login: LoginRequest = JSON.parse(decrypted);
+        log.info("Executando a LoginService.validarLogin")
         const retorno: LoginResponse = await loginService.validarLogin(login);
-        if (retorno.status === 200 && retorno.token) {
-            res.cookie("token", retorno.token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                maxAge: Number(retorno.expiration) || 3600000,
-            });
-            res.status(200).json({expiration: retorno.expiration,
-                status: retorno.status,                
+        if (retorno.status === 200 && retorno.token) {            
+            res.status(200).json({
+                token: retorno.token,
+                userName: retorno.userName,
+                expiration: retorno.expiration,
+                status: retorno.status,
                 message: retorno.message
             });
         } else {
-            res.status(retorno.status).json({message: retorno.message});
+            res.status(retorno.status).json({ message: retorno.message });
         }
     } catch (error) {
         log.error(`Erro: ${error}`);
@@ -31,13 +41,13 @@ export const validarLogin = async (req: Request, res: Response) => {
     }
 }
 
-export const validarToken = async (req:Request, res: Response) =>{
-    try{
-        const token: string = req.cookies?.token;
+export const validarToken = async (req: Request, res: Response) => {
+    try {
+        const token: string = req.headers.authorization as string;        
         log.info("Executando a LoginService.validarToken")
-        const retorno: any = await loginService.validarToken(token);        
+        const retorno: boolean = await loginService.validarToken(token);
         res.status(200).json(retorno);
-    }catch(error){
+    } catch (error) {
         log.error(`Erro ao validar o token`);
         res.status(500).json(`${error}`);
     }

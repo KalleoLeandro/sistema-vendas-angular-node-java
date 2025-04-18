@@ -93,7 +93,7 @@ public class JwtUtils implements Serializable {
                     .setSigningKey(getSecretKey())
                     .build();
 
-            parser.parseClaimsJws(sanitizeToken(token)); // só tenta parsear
+            parser.parseClaimsJws(sanitizeToken(token));
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;

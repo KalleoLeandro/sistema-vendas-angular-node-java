@@ -28,15 +28,14 @@ public class LoginRepository {
         String sql = "SELECT * FROM usuarios WHERE login = ? and senha = ?";
         LoginDTO dto = null;
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-        	System.out.println(conn.getClientInfo());
+             PreparedStatement stmt = conn.prepareStatement(sql)) {        	
             stmt.setString(1, login);
             stmt.setString(2, senha);
+            logger.info("Executando a query para buscar por login e senha");
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                dto = new LoginDTO(rs.getString("nome"), rs.getString("cpf"), rs.getString("perfil"));                
+                dto = new LoginDTO(rs.getString("nome"), rs.getString("cpf"), rs.getString("perfil"));
             }
         return dto;
         }catch (SQLException e) {

@@ -1,10 +1,13 @@
-import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
+import { inject, signal } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { LoginService } from '@services/login.service';
+import { catchError, map, of } from 'rxjs';
 
 export const authGuardGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-  /*const authService = inject(AuthenticationService);
+  const authService = inject(LoginService);
   const router = inject(Router);
-
-  return authService.checkLogin().pipe(
+  const token: string = sessionStorage.getItem('token') as string;
+  return authService.validarToken(token).pipe(
     map((isAuthenticated) => {
       if (isAuthenticated) {
         return true;
@@ -17,6 +20,6 @@ export const authGuardGuard: CanActivateFn = (route: ActivatedRouteSnapshot, sta
       sessionStorage.clear();        
       return of(router.createUrlTree(['login']));
     })
-  );*/
+  );
   return true;
 };

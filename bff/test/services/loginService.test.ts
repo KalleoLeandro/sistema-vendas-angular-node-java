@@ -31,6 +31,8 @@ describe('loginService', () => {
 
     it('retorna token e dados com status 200', async () => {
       mockedFetch.mockResolvedValue({
+        ok: true,
+        status: 200,
         json: () => Promise.resolve({
           status: 200,
           token: 'abc',
@@ -51,8 +53,9 @@ describe('loginService', () => {
 
     it('retorna status 401 com mensagem de erro', async () => {
       mockedFetch.mockResolvedValue({
+        ok: false,
+        status: 401,
         json: () => Promise.resolve({
-          status: 401,
           message: 'Credenciais inválidas'
         })
       });
@@ -67,8 +70,9 @@ describe('loginService', () => {
 
     it('retorna status 500 para outros erros da API', async () => {
       mockedFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
         json: () => Promise.resolve({
-          status: 500,
           message: 'Erro inesperado'
         })
       });

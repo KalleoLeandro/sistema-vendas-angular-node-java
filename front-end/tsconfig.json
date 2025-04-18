@@ -7,7 +7,12 @@
     "baseUrl": "src",
     "paths": {
       "@components/*": ["app/components/*"],
-      "@pages/*": ["app/pages/*"]
+      "@pages/*": ["app/pages/*"],
+      "@services/*": ["app/services/*"],
+      "@models/*": ["app/models/*"],
+      "@environments/*": ["app/environments/*"],
+      "@utils/*": ["app/utils/*"],
+      "@guards/*": ["app/guards/*"]
     },
     "strict": true,
     "noImplicitOverride": true,
