@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.services.impl.LoginServiceImpl;
@@ -31,6 +32,8 @@ public class LoginControllerTest {
 	
 	private LoginResponse loginResponse;	
 	
+	private  CadastroLoginRequest cadastroLoginRequest; 
+	
 	@BeforeEach
     public void setup() {
 		loginRequest = new LoginRequest();
@@ -41,7 +44,15 @@ public class LoginControllerTest {
         loginResponse.setStatus(HttpStatus.OK);
         loginResponse.setToken("token");
         loginResponse.setExpiration("01/01/2024 12:00:00");
-        loginResponse.setUserName("user");   
+        loginResponse.setUserName("user");  
+        
+        cadastroLoginRequest = new CadastroLoginRequest();
+        cadastroLoginRequest.setNome("teste");
+        cadastroLoginRequest.setCpf("22233344405");
+        cadastroLoginRequest.setLogin("user");
+        cadastroLoginRequest.setSenha("password");
+        cadastroLoginRequest.setPerfil("dev");
+        
        
     }
 	
@@ -59,5 +70,12 @@ public class LoginControllerTest {
 		ResponseEntity<Boolean> response = controller.validarToken("token");
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertTrue(response.getBody());
+	}
+	
+	@Test
+	public void testCadastrarLoginOk() {
+		Mockito.doNothing().when(service).cadastrarLogin(any());
+		ResponseEntity<Void> response = controller.cadastrarLogin(cadastroLoginRequest);
+		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());		
 	}
 }

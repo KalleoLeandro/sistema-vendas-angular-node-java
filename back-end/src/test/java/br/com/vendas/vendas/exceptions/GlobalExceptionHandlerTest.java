@@ -12,10 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import br.com.vendas.vendas.exceptions.schemas.DefaultErrorResponse;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,14 +32,13 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     void testHandleDefaultErrorException() {
-        DefaultErrorException exception = new DefaultErrorException("Erro interno", HttpStatus.INTERNAL_SERVER_ERROR);
-        WebRequest request = mock(WebRequest.class);
+        DefaultErrorException exception = new DefaultErrorException("Erro interno", HttpStatus.INTERNAL_SERVER_ERROR);        
 
-        ResponseEntity<ErrorDetails> response = globalExceptionHandler.handleDefaultErrorException(exception, request);
+        ResponseEntity<DefaultErrorResponse> response = globalExceptionHandler.handleDefaultError(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Erro interno", response.getBody().getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getBody().getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getBody().getStatus());
     }
 
     @Test

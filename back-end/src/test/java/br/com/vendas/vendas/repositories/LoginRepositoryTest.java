@@ -1,121 +1,158 @@
 package br.com.vendas.vendas.repositories;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)	
 class LoginRepositoryTest {
 
-    @InjectMocks
-    private LoginRepository loginRepository;
+	@InjectMocks
+	private LoginRepository loginRepository;
 
     @Mock
     private DataSource dataSource;
-
+    
     @Mock
-    private Connection connection; 
-
-    @Mock
-    private PreparedStatement preparedStatement;
-
-    @Mock
-    private ResultSet resultSet;
-
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-    @Test
-    void testBuscarPorLoginESenha_Success() throws SQLException {
-        // Setup dos mocks
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    void testBuscarPorLoginESenha_Success() throws Exception {
         String login = "usuario-teste";
-        String senha = "123";
-        String sql = "SELECT * FROM usuarios WHERE login = ? and senha = ?";
-        
-        Mockito.when(dataSource.getConnection()).thenReturn(connection);
-        Mockito.when(connection.prepareStatement(sql)).thenReturn(preparedStatement);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        Mockito.when(resultSet.next()).thenReturn(true);
-        Mockito.when(resultSet.getString("nome")).thenReturn("Nome Teste");
-        Mockito.when(resultSet.getString("cpf")).thenReturn("12345678901");
-        Mockito.when(resultSet.getString("perfil")).thenReturn("user");
+        String senha = "123";        
 
-        
+        Mockito.doAnswer(invocation -> {
+            RowMapper<LoginDTO> rowMapper = invocation.getArgument(2);
+
+            ResultSet rs = Mockito.mock(ResultSet.class);
+            Mockito.when(rs.getString("nome")).thenReturn("Nome Teste");
+            Mockito.when(rs.getString("cpf")).thenReturn("12345678901");
+            Mockito.when(rs.getString("perfil")).thenReturn("user");
+
+            return rowMapper.mapRow(rs, 1);
+        }).when(namedParameterJdbcTemplate).queryForObject(
+            Mockito.anyString(),            
+            Mockito.any(MapSqlParameterSource.class),
+            Mockito.any(RowMapper.class)
+        );
+
         LoginDTO result = loginRepository.buscarPorLoginESenha(login, senha);
 
-        
         Assertions.assertNotNull(result);
         Assertions.assertEquals("Nome Teste", result.getNome());
         Assertions.assertEquals("12345678901", result.getCpf());
         Assertions.assertEquals("user", result.getPerfil());
-
-        
-        Mockito.verify(dataSource).getConnection();
-        Mockito.verify(connection).prepareStatement(sql);
-        Mockito.verify(preparedStatement).setString(1, login);
-        Mockito.verify(preparedStatement).setString(2, senha);
-        Mockito.verify(preparedStatement).executeQuery();
     }
-
-    @Test
-    void testBuscarPorLoginESenha_NotFound() throws SQLException {
-        
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    void testBuscarPorLoginESenha_NotFound() {
         String login = "usuario-invalido";
-        String senha = "senha-invalida";
-        String sql = "SELECT * FROM usuarios WHERE login = ? and senha = ?";
+        String senha = "senha-invalida";        
 
-        Mockito.when(dataSource.getConnection()).thenReturn(connection);
-        Mockito.when(connection.prepareStatement(sql)).thenReturn(preparedStatement);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet);
-        Mockito.when(resultSet.next()).thenReturn(false);
+        Mockito.when(namedParameterJdbcTemplate.queryForObject(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class),
+                Mockito.any(RowMapper.class)
+        )).thenThrow(EmptyResultDataAccessException.class);
         
         LoginDTO result = loginRepository.buscarPorLoginESenha(login, senha);
 
-
         Assertions.assertNull(result);
 
-        Mockito.verify(dataSource).getConnection();
-        Mockito.verify(connection).prepareStatement(sql);
-        Mockito.verify(preparedStatement).setString(1, login);
-        Mockito.verify(preparedStatement).setString(2, senha);
-        Mockito.verify(preparedStatement).executeQuery();
+        Mockito.verify(namedParameterJdbcTemplate).queryForObject(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class),
+                Mockito.any(RowMapper.class)
+        );
     }
 
-    @Test
-    void testBuscarPorLoginESenha_Exception() throws SQLException {
-       
+
+    @SuppressWarnings({ "unchecked", "serial" })
+	@Test
+    void testBuscarPorLoginESenha_Exception() {
         String login = "usuario-teste";
         String senha = "123";
-        String sql = "SELECT * FROM usuarios WHERE login = ? and senha = ?";
-
-        Mockito.when(dataSource.getConnection()).thenReturn(connection);
-        Mockito.when(connection.prepareStatement(sql)).thenThrow(new SQLException("Erro na conexão"));
+        String sql = "SELECT nome, cpf, perfil FROM usuarios WHERE login = :login AND senha = :senha";
         
-        DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+        Mockito.when(namedParameterJdbcTemplate.queryForObject(
+            Mockito.eq(sql),
+            Mockito.any(MapSqlParameterSource.class),
+            Mockito.any(RowMapper.class)
+        )).thenThrow(new DataAccessException("..."){ });
+
+        
+        DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
             loginRepository.buscarPorLoginESenha(login, senha);
         });
+        
+        Assertions.assertEquals("Erro ao consultar os dados na base", ex.getMessage());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
+    }
+    
+    @Test
+    void testCadastrarLogin_Success() throws Exception {
+        CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05", "teste_user", "123456", "dev");
 
-        Assertions.assertEquals("Erro ao consultar os dados na base", exception.getMessage());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
+        Mockito.when(namedParameterJdbcTemplate.update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)
+        )).thenReturn(1); 
+
+        loginRepository.cadastrarLogin(cadastroLoginRequest);
+        
+        Mockito.verify(namedParameterJdbcTemplate).update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)                
+        );
+    }    
+    
+	@SuppressWarnings("serial")
+	@Test
+    void testCadastrarLogin_Exception() {
+		CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05", "teste_user", "123456", "dev");
+        
+		Mockito.when(namedParameterJdbcTemplate.update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)
+        )).thenThrow(new DataAccessException("..."){ });
+        
+        DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+        	loginRepository.cadastrarLogin(cadastroLoginRequest);
+        });
+        
+        Assertions.assertEquals("Erro ao gravar os dados na base", ex.getMessage());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
     }
 }

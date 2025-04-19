@@ -2,6 +2,7 @@ package br.com.vendas.vendas.services;
 
 import java.util.Date;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.junit.jupiter.api.Assertions;
@@ -18,10 +19,12 @@ import org.springframework.test.context.TestPropertySource;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.repositories.LoginRepository;
 import br.com.vendas.vendas.services.impl.LoginServiceImpl;
+import br.com.vendas.vendas.utils.GeralUtils;
 import br.com.vendas.vendas.utils.JwtUtils;
 
 @SpringBootTest
@@ -40,6 +43,9 @@ class LoginServiceImplTest {
 
     @InjectMocks
     private LoginServiceImpl loginService;
+    
+    @Mock
+    private GeralUtils geralUtils;
 
     @BeforeEach
     void setUp() {
@@ -51,12 +57,12 @@ class LoginServiceImplTest {
         LoginRequest request = new LoginRequest("usuario-teste", "123");
         LoginDTO dto = new LoginDTO();
         dto.setNome("Usuário Teste");
-        dto.setPerfil("ROLE_USER"); // Perfil user
+        dto.setPerfil("ROLE_USER");
 
         Mockito.when(loginRepository.buscarPorLoginESenha("usuario-teste", "123")).thenReturn(dto);
         Mockito.when(jwtUtils.generateToken(anyString(), anyString(), anyString())).thenReturn("token-abc");
         Mockito.when(jwtUtils.getExpirationDateFromToken("token-abc")).thenReturn(new Date());
-
+        Mockito.when(geralUtils.converterData(any())).thenReturn("01/01/2000");
         LoginResponse response = loginService.validarLogin(request);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatus());
@@ -78,7 +84,7 @@ class LoginServiceImplTest {
         Mockito.when(loginRepository.buscarPorLoginESenha("admin-teste", "123")).thenReturn(dto);
         Mockito.when(jwtUtils.generateToken(anyString(), anyString(), anyString())).thenReturn("token-abc");
         Mockito.when(jwtUtils.getExpirationDateFromToken("token-abc")).thenReturn(new Date());
-
+        Mockito.when(geralUtils.converterData(any())).thenReturn("01/01/2000");
         LoginResponse response = loginService.validarLogin(request);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatus());
@@ -100,6 +106,7 @@ class LoginServiceImplTest {
         Mockito.when(loginRepository.buscarPorLoginESenha("dev-teste", "123")).thenReturn(dto);
         Mockito.when(jwtUtils.generateToken(anyString(), anyString(), anyString())).thenReturn("token-abc");
         Mockito.when(jwtUtils.getExpirationDateFromToken("token-abc")).thenReturn(new Date());
+        Mockito.when(geralUtils.converterData(any())).thenReturn("01/01/2000");
 
         LoginResponse response = loginService.validarLogin(request);
 
@@ -170,4 +177,52 @@ class LoginServiceImplTest {
         Assertions.assertEquals("Erro na execução da validação do token", exception.getMessage());
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
     }
+    
+    @SuppressWarnings("static-access")
+	@Test
+    void testCadastrarLogin_CpfValido() {        
+        CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05", "teste_user", "123456", "dev");
+        
+        Mockito.when(geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf())).thenReturn(false);
+        
+        Mockito.doNothing().when(loginRepository).cadastrarLogin(Mockito.any(CadastroLoginRequest.class));
+
+        loginService.cadastrarLogin(cadastroLoginRequest);
+
+        Mockito.verify(loginRepository, Mockito.times(1)).cadastrarLogin(Mockito.any(CadastroLoginRequest.class));
+    }
+
+    
+    @Test
+    void testCadastrarLogin_CpfInvalido() {        
+        CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "123.456.789-00", "teste_user", "123456", "dev");
+                
+        Mockito.when(geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf())).thenReturn(true);
+        
+        DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+            loginService.cadastrarLogin(cadastroLoginRequest);
+        });
+
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
+        Assertions.assertEquals("Cpf inválido", exception.getMessage());
+        
+    }
+    
+    @Test
+    void testCadastrarLogin_Falha() {        
+        CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "123.456.789-00", "teste_user", "123456", "dev");
+                
+        Mockito.when(geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf())).thenReturn(false);
+        Mockito.doThrow(new DefaultErrorException("Erro ao gravar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR))
+        .when(loginRepository).cadastrarLogin(cadastroLoginRequest);
+        
+        DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+            loginService.cadastrarLogin(cadastroLoginRequest);
+        });
+        
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
+        Assertions.assertEquals("Erro ao gravar os dados na base", exception.getMessage());
+    }
+
+
 }

@@ -8,11 +8,12 @@ import org.springframework.stereotype.Service;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.repositories.LoginRepository;
 import br.com.vendas.vendas.services.LoginService;
-import br.com.vendas.vendas.utils.DateUtils;
+import br.com.vendas.vendas.utils.GeralUtils;
 import br.com.vendas.vendas.utils.JwtUtils;
 
 @Service
@@ -22,6 +23,9 @@ public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	private LoginRepository loginRepository;
+	
+	@Autowired
+	private GeralUtils geralUtils;
 
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -37,7 +41,7 @@ public class LoginServiceImpl implements LoginService {
 				response.setUserName(dto.getNome());				
 				response.setToken(jwtUtils.generateToken(response.getUserName(), loginRequest.getLogin(), dto.getPerfil()));
 				response.setExpiration(
-						DateUtils.converterData(jwtUtils.getExpirationDateFromToken(response.getToken())));
+						geralUtils.converterData(jwtUtils.getExpirationDateFromToken(response.getToken())));
 				return response;
 			} else {
 				response.setStatus(HttpStatus.UNAUTHORIZED);
@@ -61,6 +65,20 @@ public class LoginServiceImpl implements LoginService {
 			logger.error("Erro na execução da validação do token", HttpStatus.INTERNAL_SERVER_ERROR);
 			throw new DefaultErrorException("Erro na execução da validação do token",
 					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public void cadastrarLogin(CadastroLoginRequest cadastroLoginRequest) {		
+		try{
+			if(!geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf())) {
+			logger.info("Executando o LoginRepository.cadastrarLogin");
+			loginRepository.cadastrarLogin(cadastroLoginRequest);
+			} else { 
+				throw new DefaultErrorException("Cpf inválido", HttpStatus.BAD_REQUEST);
+			}
+		}catch (Exception e) {
+			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

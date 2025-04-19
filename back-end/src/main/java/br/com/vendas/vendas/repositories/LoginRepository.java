@@ -1,46 +1,68 @@
 package br.com.vendas.vendas.repositories;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 
 @Repository
 public class LoginRepository {
 	
 	private static final Logger logger = LoggerFactory.getLogger(LoginRepository.class);
-
+    
     @Autowired
-    private DataSource dataSource;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    
+    final RowMapper<LoginDTO> loginRowMapper = (rs, rowNum) ->
+    LoginDTO.builder()
+        .nome(rs.getString("nome"))
+        .cpf(rs.getString("cpf"))
+        .perfil(rs.getString("perfil"))
+        .build();
 
-    public LoginDTO buscarPorLoginESenha(String login, String senha) {
-        String sql = "SELECT * FROM usuarios WHERE login = ? and senha = ?";
-        LoginDTO dto = null;
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {        	
-            stmt.setString(1, login);
-            stmt.setString(2, senha);
-            logger.info("Executando a query para buscar por login e senha");
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                dto = new LoginDTO(rs.getString("nome"), rs.getString("cpf"), rs.getString("perfil"));
-            }
-        return dto;
-        }catch (SQLException e) {
-        	logger.error(e.getMessage());
-        	throw new DefaultErrorException("Erro ao consultar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
-		}		    
+    public LoginDTO buscarPorLoginESenha(String login, String senha) {        
+    	
+    	String sql = "SELECT nome, cpf, perfil FROM usuarios WHERE login = :login AND senha = :senha";
+
+    	MapSqlParameterSource params = new MapSqlParameterSource()
+    	    .addValue("login", login)
+    	    .addValue("senha", senha);
+
+    	try {
+    	    return namedParameterJdbcTemplate.<LoginDTO>queryForObject(sql, params, loginRowMapper);
+    	} catch (EmptyResultDataAccessException e) {
+    	    return null;
+    	} catch (DataAccessException e) {
+    	    logger.error(e.getMessage());    	    
+    	    throw new DefaultErrorException("Erro ao consultar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    
+    public void cadastrarLogin(CadastroLoginRequest cadastroLoginRequest) {
+    	String sql = "INSERT INTO usuarios(nome,cpf, login, senha, perfil) values(:nome, :cpf, :login, :senha, :perfil)";
+    	MapSqlParameterSource params = new MapSqlParameterSource()
+        	    .addValue("nome", cadastroLoginRequest.getNome())
+        	    .addValue("cpf", cadastroLoginRequest.getClass())
+    			.addValue("login", cadastroLoginRequest.getLogin())
+    			.addValue("senha", cadastroLoginRequest.getSenha())
+    			.addValue("perfil", cadastroLoginRequest.getPerfil());
+
+        	try {
+        		 namedParameterJdbcTemplate.update(sql, params);        		 
+        	} catch (DataAccessException e) {
+        	    logger.error(e.getMessage());    	    
+        	    throw new DefaultErrorException("Erro ao gravar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
+        	}
     }
 }
