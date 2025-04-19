@@ -32,7 +32,6 @@ public class CadastroLoginRequest {
 	private String login;
 
 	@Schema(description = "Senha do usuário", example = "Senha@123", requiredMode = Schema.RequiredMode.REQUIRED)
-
 	@NotEmpty(message = "A senha não pode estar vazio")
 	@NotBlank(message = "A senha não pode estar vazio")
 	private String senha;
