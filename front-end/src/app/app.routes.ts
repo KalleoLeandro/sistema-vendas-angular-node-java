@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuardGuard } from '@guards/auth.guard.guard';
+import { CadastroUsuarioComponent } from '@pages/usuarios/cadastro-usuario/cadastro-usuario.component';
 
 export const routes: Routes = [
     {
@@ -15,15 +16,15 @@ export const routes: Routes = [
         path: '', loadComponent: () => import("@pages/main/main.component").then(c => c.MainComponent), canActivate: [authGuardGuard], children: [
             { 
                 path: 'home', loadComponent: () => import("@pages/main/home/home.component").then(c => c.HomeComponent),
-            }
-            /*{
-                path: 'usuarios', children: [
-                    { path: 'cadastro', component: CadastroUsuarioComponent },
-                    { path: 'cadastro/:id', component: CadastroUsuarioComponent },
-                    { path: 'lista', component: ListarUsuarioComponent }
-                ]
             },
             {
+                path: 'usuarios', children: [
+                    { path: 'cadastro', loadComponent: () => import("@pages/usuarios/cadastro-usuario/cadastro-usuario.component").then(c => c.CadastroUsuarioComponent)},
+                    //{ path: 'cadastro/:id', component: CadastroUsuarioComponent },
+                    //{ path: 'lista', component: ListarUsuarioComponent }
+                ]
+            },
+            /*{
                 path: 'produtos', children: [
                     { path: 'cadastro', component: CadastrarProdutoComponent },
                     { path: 'cadastro/:id', component: CadastrarProdutoComponent }

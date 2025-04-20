@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.vendas.vendas.exceptions.schemas.DefaultErrorResponse;
+import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
@@ -23,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @Tag(name = "Login", description = "Endpoints de login e token")
@@ -60,16 +63,28 @@ public class LoginController {
 		return ResponseEntity.ok(loginService.validarToken(token));
 	}
 
-	@Operation(summary = "Faz o cadastro de um login", description = "Valida dados e cadastra o login")
+	@Operation(summary = "Faz o cadastro de um login", description = "Valida dados e cadastra o login", security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Cadastro bem-sucedido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CadastroLoginRequest.class))),
 			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),			
 			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
 	@PostMapping("/cadastrar-login")
 	public ResponseEntity<Void> cadastrarLogin(@RequestBody @Valid CadastroLoginRequest cadastroLoginRequest) {
-		logger.info("Executando a LoginService.validarToken");
+		logger.info("Executando a LoginService.cadastrarLogin");
 		loginService.cadastrarLogin(cadastroLoginRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
+	
+	@Operation(summary = "Faz a atualização de um login", description = "Valida dados e atualiza o login", security = @SecurityRequirement(name = "bearerAuth"))
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Atualização bem-sucedida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AtualizacaoLoginRequest.class))),
+			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),			
+			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
+	@PutMapping("/atualizar-login")
+	public ResponseEntity<Void> atualizarLogin(@RequestBody @Valid AtualizacaoLoginRequest atualizacaoLoginRequest) {
+		logger.info("Executando a LoginService.atualizarLogin");
+		loginService.atualizarLogin(atualizacaoLoginRequest);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }

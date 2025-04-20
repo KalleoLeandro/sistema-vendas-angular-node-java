@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+    /* Cores principais */
+    --color-primary: #006437;
+    --color-primary-hover: #00994C;
+    --color-background: #FFFFFF;
+    --color-text: #2D2D2D;
+  
+    /* Cores de status */
+    --color-success: #28A745;
+    --color-error: #DC3545;
+    --color-warning: #FFC107;
+    --color-info: #17A2B8;
+  
+    /* Tons neutros */
+    --color-gray-light: #F5F5F5;
+    --color-gray-medium: #CCCCCC;
+    --color-gray-dark: #666666;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  

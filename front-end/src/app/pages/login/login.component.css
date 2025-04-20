@@ -1,87 +1,60 @@
-.content {
-    display: flex;
-    justify-content: center; /* Centraliza horizontalmente */
-    align-items: center; /* Centraliza verticalmente */
-    height: 100vh; /* Altura da tela inteira */
-    width: 100vw;
-    background-color: #305E8C;    
-}
-
-.card{
+/* Centralizar o card no meio da tela */
+.d-flex {
     display: flex;
     justify-content: center;
-    flex-direction: column;    
-    border-radius: 40px;
-    width: 35%;
-    height: 350px;    
-    overflow: hidden;
-}
-
-.titulo{
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centraliza horizontalmente */
-    align-items: center; /* Centraliza verticalmente */    
+    align-items: center;
+    height: 100vh;  /* Full height */
+    background-color: #ffffff;
+  }
+  
+  /* Card */
+  .login-card {
+    max-width: 400px;
     width: 100%;
-    height: 30%;
-    background-color: #97BAE1;
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Título do card */
+  .login-card h3 {
+    margin-bottom: 1.5rem;
+    font-size: 24px;
+    text-align: center;
+    color: #006437; /* Verde escuro */
+  }
+  
+  /* Estilo dos inputs */
+  .form-control {
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-label {
     font-weight: bold;
-}
-
-.conteudo{
-    background-color: #D4E3EA;
-    width: 100%;
-    height: 70%;
-    display: flex;
-    padding: 20px;       
-}
-
-form{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-input{
-    height: 40px;
-    margin-bottom: 10px;
-}
-
-.btn-login{
-    margin: 50px auto 0 auto;
-    width: 50%;
-    height: 40px !important;
-    background-color: #97BAE1 !important;  
-    border: 1px solid #5b7ea5;   
-    border-radius: 10px;
+    color: #333333;
+  }
+  
+  /* Botão de login */
+  .login-btn {
+    background-color: #006437;  /* Verde */
     color: white;
-}
-
-.btn-login:hover{
-    border: 3px solid #3068a8;        
-    transition: 0.05s;
-}
-
-@media screen and (max-width: 750px) {
-    .card{
-        width: 70%;
-    }
-
-    .titulo h1{
-        font-size: 20px;
-    }
-}
-
-@media screen and (max-width: 992px) {
-    .card{
-        width: 50%;
-    }
-
-    .titulo h1{
-        font-size: 24px;
-    }
-}
+    font-weight: bold;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Hover para o botão de login */
+  .login-btn:hover {
+    background-color: #004b2e;  /* Tom mais escuro de verde */
+  }
+  
+  /* Mensagem de erro */
+  .text-danger {
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  

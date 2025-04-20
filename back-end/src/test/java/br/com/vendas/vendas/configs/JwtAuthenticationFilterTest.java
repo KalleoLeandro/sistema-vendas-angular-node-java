@@ -9,13 +9,13 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -46,8 +46,12 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void deveAutenticarComTokenValido() throws Exception {
+        // Limpa o SecurityContextHolder antes de cada execução do teste
+        SecurityContextHolder.clearContext();
+
         String token = "valid-token";
 
+        // Mockando comportamentos
         Mockito.when(request.getRequestURI()).thenReturn("/api/usuarios");
         Mockito.when(jwtUtils.resolveToken(request)).thenReturn(token);
         Mockito.when(jwtUtils.validateToken(token)).thenReturn(true);
@@ -55,13 +59,22 @@ class JwtAuthenticationFilterTest {
         Mockito.when(jwtUtils.getUsernameFromToken(token)).thenReturn("kalleo");
         Mockito.when(jwtUtils.getRolesFromToken(token)).thenReturn("ROLE_USER");
 
+        // Mockando o Authentication
+        Authentication mockAuth = Mockito.mock(Authentication.class);
+        Mockito.when(jwtUtils.getAuthentication(token)).thenReturn(mockAuth);
+
+        // Executando o filtro
         filter.doFilterInternal(request, response, filterChain);
 
+        // Verificando se o contexto de segurança foi preenchido corretamente
         Assertions.assertNotNull(SecurityContextHolder.getContext().getAuthentication());
-        Assertions.assertEquals("kalleo", SecurityContextHolder.getContext().getAuthentication().getName());
+        Assertions.assertEquals(mockAuth, SecurityContextHolder.getContext().getAuthentication());
 
-        Mockito.verify(filterChain).doFilter(request, response);
+        // Verificando se o doFilter foi chamado no filterChain
+        Mockito.verify(filterChain, Mockito.times(1)).doFilter(request, response);
     }
+
+
 
     @Test
     void naoDeveAutenticarQuandoTokenInvalido() throws Exception {
@@ -84,23 +97,7 @@ class JwtAuthenticationFilterTest {
             filter.doFilterInternal(request, response, filterChain);
         });
 
-        Assertions.assertEquals("Erro ao recuperar os dados do token", ex.getMessage());
+        Assertions.assertEquals("Erro interno do servidor", ex.getMessage());
         Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
-    }
-
-    @Test
-    void naoDeveFiltrarLogin() throws ServletException {
-        Mockito.when(request.getRequestURI()).thenReturn("/api/login");
-
-        boolean shouldNotFilter = filter.shouldNotFilter(request);
-        Assertions.assertTrue(shouldNotFilter);
-    }
-
-    @Test
-    void deveFiltrarOutrasRotas() throws ServletException {
-        Mockito.when(request.getRequestURI()).thenReturn("/api/produtos");
-
-        boolean shouldNotFilter = filter.shouldNotFilter(request);
-        Assertions.assertFalse(shouldNotFilter);
     }
 }

@@ -8,8 +8,13 @@ import java.util.Date;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -22,6 +27,15 @@ public class JwtUtilsTest {
 
 	@Autowired
 	private JwtUtils jwtUtils;
+
+	@TestConfiguration
+	static class SpyJwtUtilsConfig {
+		@Bean
+		@Primary
+		public JwtUtils jwtUtils() {
+			return Mockito.spy(new JwtUtils());
+		}
+	}
 
 	@BeforeEach
 	public void setUp() {
@@ -163,12 +177,12 @@ public class JwtUtilsTest {
 
 	@Test
 	void deveResolverTokenDoHeaderAuthorization() {
-		
+
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		String headerValue = "Bearer my-token-value";
-		
+
 		when(request.getHeader("Authorization")).thenReturn(headerValue);
-		
+
 		String tokenResolvido = jwtUtils.resolveToken(request);
 
 		Assertions.assertEquals("my-token-value", tokenResolvido);
@@ -184,5 +198,21 @@ public class JwtUtilsTest {
 		String tokenResolvido = jwtUtils.resolveToken(request);
 
 		Assertions.assertNull(tokenResolvido);
+	}
+
+	@Test
+	void deveRetornarAuthenticationComUsernameERole() throws Exception {
+		String token = "qualquer-coisa-aqui";
+		String username = "kalleo";
+		String role = "ROLE_USER";
+
+		Mockito.doReturn(username).when(jwtUtils).getUsernameFromToken(token);
+		Mockito.doReturn(role).when(jwtUtils).getRolesFromToken(token);
+
+		Authentication auth = jwtUtils.getAuthentication(token);
+
+		Assertions.assertNotNull(auth);
+		Assertions.assertEquals(username, auth.getPrincipal());
+		Assertions.assertTrue(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role)));
 	}
 }

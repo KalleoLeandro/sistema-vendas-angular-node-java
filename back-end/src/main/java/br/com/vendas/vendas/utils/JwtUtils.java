@@ -4,10 +4,14 @@ import java.io.Serializable;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.*;
@@ -98,6 +102,13 @@ public class JwtUtils implements Serializable {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+    
+    public Authentication getAuthentication(String token) throws Exception {
+        String username = getUsernameFromToken(token);
+        String role = getRolesFromToken(token);
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
+        return new UsernamePasswordAuthenticationToken(username, null, List.of(authority));
     }
 
     // ===================== UTILITÁRIOS =====================

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
@@ -71,9 +72,24 @@ public class LoginServiceImpl implements LoginService {
 	@Override
 	public void cadastrarLogin(CadastroLoginRequest cadastroLoginRequest) {		
 		try{
-			if(!geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf())) {
+			if(!geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf().replaceAll("[^0-9]", ""))) {
 			logger.info("Executando o LoginRepository.cadastrarLogin");
 			loginRepository.cadastrarLogin(cadastroLoginRequest);
+			} else { 
+				throw new DefaultErrorException("Cpf inválido", HttpStatus.BAD_REQUEST);
+			}
+		}catch (Exception e) {
+			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public void atualizarLogin(AtualizacaoLoginRequest atualizacaoLoginRequest) {		
+		try{
+			
+			if(!geralUtils.isCpfInvalido(atualizacaoLoginRequest.getCpf().replaceAll("[^0-9]", ""))) {
+			logger.info("Executando o LoginRepository.atualizarLogin");
+			loginRepository.atualizarLogin(atualizacaoLoginRequest);
 			} else { 
 				throw new DefaultErrorException("Cpf inválido", HttpStatus.BAD_REQUEST);
 			}

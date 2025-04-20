@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
+import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 
 @SpringBootTest
@@ -40,6 +41,12 @@ class LoginRepositoryTest {
     
     @Mock
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    
+    private CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05",
+			"teste_user", "123456", "dev");
+
+	private AtualizacaoLoginRequest atualizacaoLoginRequest = new AtualizacaoLoginRequest(1, "teste", "123.456.789-00",
+			"teste_user", "123456", "dev");
     
     @BeforeEach
     void setUp() {
@@ -122,9 +129,7 @@ class LoginRepositoryTest {
     }
     
     @Test
-    void testCadastrarLogin_Success() throws Exception {
-        CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05", "teste_user", "123456", "dev");
-
+    void testCadastrarLogin_Success() throws Exception {        
         Mockito.when(namedParameterJdbcTemplate.update(
                 Mockito.anyString(),
                 Mockito.any(MapSqlParameterSource.class)
@@ -140,8 +145,7 @@ class LoginRepositoryTest {
     
 	@SuppressWarnings("serial")
 	@Test
-    void testCadastrarLogin_Exception() {
-		CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05", "teste_user", "123456", "dev");
+    void testCadastrarLogin_Exception() {		
         
 		Mockito.when(namedParameterJdbcTemplate.update(
                 Mockito.anyString(),
@@ -150,6 +154,38 @@ class LoginRepositoryTest {
         
         DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
         	loginRepository.cadastrarLogin(cadastroLoginRequest);
+        });
+        
+        Assertions.assertEquals("Erro ao gravar os dados na base", ex.getMessage());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
+    }
+	@Test
+    void testAtualizarLogin_Success() throws Exception {        
+
+        Mockito.when(namedParameterJdbcTemplate.update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)
+        )).thenReturn(1); 
+
+        loginRepository.atualizarLogin(atualizacaoLoginRequest);
+        
+        Mockito.verify(namedParameterJdbcTemplate).update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)                
+        );
+    }    
+    
+	@SuppressWarnings("serial")
+	@Test
+    void testAtualizar_Exception() {		
+        
+		Mockito.when(namedParameterJdbcTemplate.update(
+                Mockito.anyString(),
+                Mockito.any(MapSqlParameterSource.class)
+        )).thenThrow(new DataAccessException("..."){ });
+        
+        DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+        	loginRepository.atualizarLogin(atualizacaoLoginRequest);
         });
         
         Assertions.assertEquals("Erro ao gravar os dados na base", ex.getMessage());

@@ -3,109 +3,115 @@
     max-width: 100vw;
     display: flex;
     flex-direction: column;
-    background-color: #97BAE1 !important;   
-    color: white;
+    background-color: var(--color-background);
+    color: var(--color-text);
 }
 
-.navbar{
-    background-color: #305E8C;     
-    border-bottom: 2px solid #102e4d;
+.navbar {
+    background-color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary-hover);
 }
 
-ul li a{
+.nav-link {
+    cursor: pointer;
+}
+
+ul li a {
     font-weight: bold;
     color: white;
 }
 
-footer{    
+.footer {    
     height: 50px;
     bottom: 0;
-    background-color: #305E8C;  
+    background-color: var(--color-primary);  
     display: flex;
     justify-content: center;
     align-items: center;    
-    border-top: 2px solid #102e4d;
+    border-top: 2px solid var(--color-primary-hover);
 }
 
-p{
+p {
     margin: 0; 
     color: white;     
 }
 
-.conteudo{
+.conteudo {
     display: flex;
     flex-direction: row;    
     flex: 1;    
 }
 
-.sidebar{    
+.sidebar {    
     width: 15%;
-    background-color: #305E8C;    
+    background-color: var(--color-primary);    
     display: flex;
     flex-direction: column; 
-    
-    border-right: 2px solid #102e4d;       
+    border-right: 2px solid var(--color-primary-hover);       
 }
 
-.sidebar ul{
+.sidebar ul {
     margin: 0 auto;
     font-size: 18px;
 }
 
-.sidebar ul li{
+.sidebar ul li {
     margin: 15px auto;
 }
 
-.pagina{
+.pagina {
     margin: 10px;
     flex: 1;
 }
 
-.list{
+.list {
     width: 100%;
     display: flex;
     justify-content: left;
     align-items: center;
 }
 
-.list-sidebar{
+.list-sidebar {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-.link-sidebar{
+.link-sidebar {
     text-align: right;
 }
 
-i{
+i {
     margin-right: 15px;
     color: white; 
 }
 
-
-.dropdown, .dropdown-toogle, .dropdown-menu{
-    background-color: #305E8C !important;
+.dropdown,
+.dropdown-toggle,
+.dropdown-menu {
+    background-color: var(--color-primary) !important;
     margin: 0;
     padding: 0;    
 }
 
-.dropdown a{
+.dropdown a {
     text-decoration: none;
 }
 
 .dropdown-item {    
-    background-color: #305E8C !important;;
-    color:white !important;
+    background-color: var(--color-primary) !important;
+    color: white !important;
     font-size: 14px;
     transition: 0.2s;
 }
 
-.dropdown-item:hover{
-    background-color: #97BAE1 !important;
-    color:black !important;
+.dropdown-item:hover {
+    background-color: var(--color-background) !important;
+    cursor: pointer;
+    color: var(--color-primary) !important;
 }
 
+/* RESPONSIVIDADE */
 
 @media screen and (max-width: 991px) {
     .sidebar {
@@ -113,7 +119,7 @@ i{
         visibility: hidden;
     } 
     
-    .navbar     {
+    .navbar {
         font-size: 16px;
     }
 }
@@ -123,7 +129,7 @@ i{
         width: 15%;
     }        
 
-    .navbar     {
+    .navbar {
         font-size: 12px;
     }
 }

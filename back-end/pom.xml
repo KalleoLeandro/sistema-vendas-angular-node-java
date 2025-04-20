@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>br.com.vendas</groupId>
 	<artifactId>vendas</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<name>vendas</name>
 	<description>Projeto Back End Vendas</description>
 	<url />

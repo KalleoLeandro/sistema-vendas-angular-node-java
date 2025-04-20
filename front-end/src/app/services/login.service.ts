@@ -35,5 +35,20 @@ export class LoginService {
       )
     );
   }
+
+  public getPerfil(token: string) : Observable<Boolean> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'authorization': `${token}`,
+      })
+    }
+
+    return this.#httpClient.post<Boolean>(`${this.#url()}/retorna-perfil`, null, httpOptions).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => error)
+      )
+    );
+  }
 }
 

@@ -1,0 +1,101 @@
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <!--<h1 class="h3 mb-2 text-gray-800">Cadastro de Usuário</h1>-->
+    <div class="card mb-4">
+        <div class="card-header py-3 mb-2">
+            <h6 class="m-0 font-weight-bold text-success">Cadastro de Usuários</h6>
+        </div>
+        <div class="col-12">
+            <form [formGroup]="cadastroForm">
+                <input type="text" name="id" id="id" formControlName="id">
+                <div class="card-header py-3 mb-2">
+                    <h6 class="m-0 font-weight-bold text-success">Dados Pessoais</h6>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Nome
+                    </label>
+                    <input type="text" formControlName="nome" class="form-control" name="nome">
+                    <small *ngIf="cadastroForm.controls['nome'].touched && cadastroForm.controls['nome'].invalid"
+                        class="text-danger">Campo obrigatório</small>
+                </div>
+                <div class="form-group">
+                    <label>
+                        CPF
+                    </label>
+                    <input type="text" formControlName="cpf" class="form-control" mask="000.000.000-00">
+                       <!-- (blur)="cpfValido()"-->
+                    <small *ngIf="cadastroForm.controls['cpf'].touched && cadastroForm.controls['cpf'].invalid"
+                        class="text-danger">Campo obrigatório</small>
+                    <small *ngIf="cpfInvalido" class="text-danger">CPF inválido</small>
+                </div>              
+                <div class="form-group">
+                    <label>
+                        Login
+                    </label>
+                    <input type="text" formControlName="login" class="form-control" name="login" required>
+                    <small *ngIf="cadastroForm.controls['login'].touched && cadastroForm.controls['login'].invalid"
+                        class="text-danger">Campo obrigatório</small>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Senha
+                    </label>
+                    <input type="text" formControlName="senha" class="form-control" name="senha" required>
+                    <small *ngIf="cadastroForm.controls['senha'].touched && cadastroForm.controls['senha'].invalid"
+                        class="text-danger">Campo obrigatório</small>
+                </div>
+                <label>
+                    Perfil
+                </label>
+                <select class="form-control" ngModel formControlName="perfil">
+                    <option value="" selected>--Selecione o perfil--</option>
+                    <option *ngFor="let item of perfil; let i = index" [value]="item">{{item}}</option>
+                </select>
+                <small *ngIf="cadastroForm.controls['perfil'].touched && cadastroForm.controls['perfil'].invalid"
+                    class="text-danger">Campo obrigatório</small>
+                <div class="botoes mt-5 mb-3">
+                    <!--[disabled]="cadastroForm.invalid"-->
+                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid">
+                        <!--(click)="cadastrarAtualizarUsuario()">-->
+                        Cadastrar</button>
+                    <button class="btn btn-warning" (click)="$event.preventDefault(); limparFormulario()">Limpar
+                        Formulário</button>
+                </div>
+                <div id="modal">
+                    <button type="button" id="botaoModal" data-bs-toggle="modal" data-bs-target="#modalConfirmacao">                        
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalConfirmacao" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacao">Cadastro de Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <span>{{resposta}}</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (click)="redirecionar()">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- /.container-fluid -->
+
+<!-- End of Main Content -->

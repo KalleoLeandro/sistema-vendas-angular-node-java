@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
 import br.com.vendas.vendas.models.responses.LoginResponse;
@@ -34,6 +35,8 @@ public class LoginControllerTest {
 	
 	private  CadastroLoginRequest cadastroLoginRequest; 
 	
+	private AtualizacaoLoginRequest atualizacaoLoginRequest;
+	
 	@BeforeEach
     public void setup() {
 		loginRequest = new LoginRequest();
@@ -52,6 +55,16 @@ public class LoginControllerTest {
         cadastroLoginRequest.setLogin("user");
         cadastroLoginRequest.setSenha("password");
         cadastroLoginRequest.setPerfil("dev");
+        
+        atualizacaoLoginRequest = new AtualizacaoLoginRequest();
+        atualizacaoLoginRequest.setId(1);
+        atualizacaoLoginRequest.setNome("teste");
+        atualizacaoLoginRequest.setCpf("22233344405");
+        atualizacaoLoginRequest.setLogin("user");
+        atualizacaoLoginRequest.setSenha("password");
+        atualizacaoLoginRequest.setPerfil("dev");
+        
+        
         
        
     }
@@ -77,5 +90,12 @@ public class LoginControllerTest {
 		Mockito.doNothing().when(service).cadastrarLogin(any());
 		ResponseEntity<Void> response = controller.cadastrarLogin(cadastroLoginRequest);
 		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());		
+	}
+	
+	@Test
+	public void testAtualizarLoginOk() {
+		Mockito.doNothing().when(service).atualizarLogin(any());
+		ResponseEntity<Void> response = controller.atualizarLogin(atualizacaoLoginRequest);
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());		
 	}
 }
