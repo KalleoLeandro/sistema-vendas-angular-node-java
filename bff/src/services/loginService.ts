@@ -91,3 +91,27 @@ export const cadastrarLogin = async (cadastroLogin: LoginCadastroDados, token: s
         throw new CustomError(error.message, 500);
     }
 }
+
+export const atualizarLogin = async (cadastroLogin: LoginCadastroDados, token: string) => {
+    try {
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(cadastroLogin)
+        }
+
+        log.info("Executando a /api/login/atualizar-login");
+        const res = await fetch(`${environments.BACK_END}/login/atualizar-login`, options);
+        const status = res.status;
+        let retorno: GenericResponse = {
+             status, message:  status === 204 ? 'Cadastro atualizado com sucesso' : 'Erro ao atualizar o login'
+        };
+        return retorno;
+    } catch (error: any) {
+        log.error(`Erro: ${error}`);
+        throw new CustomError(error.message, 500);
+    }
+}

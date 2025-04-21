@@ -172,4 +172,49 @@ describe('loginService', () => {
       await expect(loginService.cadastrarLogin(cadastroLogin, token)).rejects.toThrow('Falha na rede');
     });
   });
+  describe('atualizarLogin', () => {
+    const cadastroLogin: LoginCadastroDados = {
+      login: 'user',
+      senha: 'pass',
+      nome: 'Usuário Teste',
+      cpf: '12345678900',
+      perfil: 'admin'
+    };
+    const token = 'valid-token';
+  
+    it('retorna mensagem de sucesso com status 204', async () => {
+      mockedFetch.mockResolvedValue({
+        status: 204,
+        json: () => Promise.resolve()
+      });
+  
+      const result = await loginService.atualizarLogin(cadastroLogin, token);
+  
+      expect(result).toEqual({
+        status: 204,
+        message: 'Cadastro atualizado com sucesso'
+      });
+    });
+  
+    it('retorna mensagem de erro com status diferente de 204', async () => {
+      mockedFetch.mockResolvedValue({
+        status: 400,
+        json: () => Promise.resolve()
+      });
+  
+      const result = await loginService.atualizarLogin(cadastroLogin, token);
+  
+      expect(result).toEqual({
+        status: 400,
+        message: 'Erro ao atualizar o login'
+      });
+    });
+  
+    it('lança CustomError em caso de falha na rede', async () => {
+      mockedFetch.mockRejectedValue(new Error('Falha na rede'));
+  
+      await expect(loginService.atualizarLogin(cadastroLogin, token)).rejects.toThrow(CustomError);
+      await expect(loginService.atualizarLogin(cadastroLogin, token)).rejects.toThrow('Falha na rede');
+    });
+  });  
 });

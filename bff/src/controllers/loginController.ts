@@ -39,7 +39,7 @@ export const validarLogin = async (req: Request, res: Response) => {
         }
     } catch (error) {
         log.error(`Erro: ${error}`);
-        res.status(500).json(`Erro ao validar o login`);
+        res.status(500).json({message: `Erro ao validar o login`});
     }
 }
 
@@ -51,19 +51,30 @@ export const validarToken = async (req: Request, res: Response) => {
         res.status(200).json(retorno);
     } catch (error) {
         log.error(`Erro: ${error}`);
-        res.status(500).json(`Erro ao validar o token`);
+        res.status(500).json({message: `Erro ao validar o token`});
     }
 }
 
 export const cadastrarLogin = async (req: Request, res: Response) => {
     try {
         const cadastroLogin: LoginCadastroDados = req.body;
-        const token: string = req.headers.authorization as string;
-        console.log(token);
+        const token: string = req.headers.authorization as string;        
         const retorno: GenericResponse = await loginService.cadastrarLogin(cadastroLogin, token);
         res.status(retorno.status).json({ message: retorno.message });
     } catch (error) {
         log.error(`Erro: ${error}`);
-        res.status(500).json({"message": "Erro ao cadastrar o login"});
+        res.status(500).json({message: "Erro ao cadastrar o login"});
+    }
+}
+
+export const atualizarLogin = async (req: Request, res: Response) => {
+    try {
+        const cadastroLogin: LoginCadastroDados = req.body;
+        const token: string = req.headers.authorization as string;        
+        const retorno: GenericResponse = await loginService.atualizarLogin(cadastroLogin, token);
+        res.status(retorno.status).json({ message: retorno.message });
+    } catch (error) {
+        log.error(`Erro: ${error}`);
+        res.status(500).json({message: "Erro ao atualizar o login"});
     }
 }

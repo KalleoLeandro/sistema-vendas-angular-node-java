@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as loginService from '@services/loginService';
 import { CustomError } from '@errors/customError';
 import { decriptografia } from '@utils/utils';
-import { cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
+import { atualizarLogin, cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
 import { LoginCadastroDados } from '@models/cadastroLogin';
 
 // Mocks
@@ -57,7 +57,7 @@ describe('loginController', () => {
       await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao validar o login' });
     });
 
     it('deve retornar erro 500 quando não for possível descriptografar o hash', async () => {
@@ -68,7 +68,7 @@ describe('loginController', () => {
       await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao validar o login' });
     });
 
     it('deve retornar status 400 quando o retorno do loginService for inválido', async () => {
@@ -110,7 +110,7 @@ describe('loginController', () => {
       await validarToken(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro ao validar o token');
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao validar o token' });
     });
   });
 
@@ -122,7 +122,7 @@ describe('loginController', () => {
           authorization: 'Bearer fake-token',
         },
       } as unknown as Request;
-    
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -148,7 +148,7 @@ describe('loginController', () => {
           authorization: 'Bearer fake-token',
         },
       } as unknown as Request;
-    
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -174,6 +174,81 @@ describe('loginController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao cadastrar o login' });
+    });
+  });
+
+  describe('atualizarLogin', () => {
+    it('deve retornar sucesso quando atualização for efetuada', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+      } as unknown as Request;
+  
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+  
+      const retorno = {
+        status: 200,
+        message: 'Login atualizado com sucesso',
+      };
+  
+      (loginService.atualizarLogin as jest.Mock).mockResolvedValue(retorno);
+  
+      await atualizarLogin(req as Request, res as Response);
+  
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Login atualizado com sucesso' });
+    });
+  
+    it('deve retornar erro quando a atualização falhar', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+      } as unknown as Request;
+  
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+  
+      const retorno = {
+        status: 400,
+        message: 'Erro ao atualizar o login',
+      };
+  
+      (loginService.atualizarLogin as jest.Mock).mockResolvedValue(retorno);
+  
+      await atualizarLogin(req as Request, res as Response);
+  
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao atualizar o login' });
+    });
+  
+    it('deve retornar erro 500 caso ocorra um erro inesperado', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+      } as unknown as Request;
+  
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+  
+      (loginService.atualizarLogin as jest.Mock).mockRejectedValue(new Error('Erro inesperado'));
+  
+      await atualizarLogin(req as Request, res as Response);
+  
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao atualizar o login' });
     });
   });
 });
