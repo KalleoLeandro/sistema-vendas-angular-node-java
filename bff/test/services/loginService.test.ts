@@ -1,6 +1,7 @@
 import * as loginService from '@services/loginService';
 import { CustomError } from '@errors/customError';
 import { LoginRequest } from '@models/loginRequest';
+import { LoginCadastroDados } from '@models/cadastroLogin';
 
 global.fetch = jest.fn();
 const mockedFetch = fetch as jest.Mock;
@@ -117,6 +118,58 @@ describe('loginService', () => {
 
       await expect(loginService.validarToken('token')).rejects.toThrow(CustomError);
       await expect(loginService.validarToken('token')).rejects.toThrow('Erro ao validar');
+    });
+  });
+
+  describe('cadastrarLogin', () => {
+    const cadastroLogin: LoginCadastroDados = {
+      login: 'user',
+      senha: 'pass',
+      nome: '',
+      cpf: '',
+      perfil: ''
+    };
+    const token = 'valid-token';
+
+    it('retorna mensagem de sucesso com status 201', async () => {
+      mockedFetch.mockResolvedValue({
+        status: 201,
+        json: () => Promise.resolve({
+          status: 201,
+          message: 'Cadastro efetuado com sucesso'
+        })
+      });
+
+      const result = await loginService.cadastrarLogin(cadastroLogin, token);
+
+      expect(result).toEqual({
+        status: 201,
+        message: 'Cadastro efetuado com sucesso'
+      });
+    });
+
+    it('retorna mensagem de erro com status diferente de 201', async () => {
+      mockedFetch.mockResolvedValue({
+        status: 400,
+        json: () => Promise.resolve({
+          status: 400,
+          message: 'Erro ao cadastrar o login'
+        })
+      });
+
+      const result = await loginService.cadastrarLogin(cadastroLogin, token);
+
+      expect(result).toEqual({
+        status: 400,
+        message: 'Erro ao cadastrar o login'
+      });
+    });
+
+    it('lança CustomError em caso de erro na requisição', async () => {
+      mockedFetch.mockRejectedValue(new Error('Falha na rede'));
+
+      await expect(loginService.cadastrarLogin(cadastroLogin, token)).rejects.toThrow(CustomError);
+      await expect(loginService.cadastrarLogin(cadastroLogin, token)).rejects.toThrow('Falha na rede');
     });
   });
 });

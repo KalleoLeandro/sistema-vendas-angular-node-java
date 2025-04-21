@@ -71,11 +71,11 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public void cadastrarLogin(CadastroLoginRequest cadastroLoginRequest) {		
-		try{
+		try{			
 			if(!geralUtils.isCpfInvalido(cadastroLoginRequest.getCpf().replaceAll("[^0-9]", ""))) {
 			logger.info("Executando o LoginRepository.cadastrarLogin");
 			loginRepository.cadastrarLogin(cadastroLoginRequest);
-			} else { 
+			} else {
 				throw new DefaultErrorException("Cpf inválido", HttpStatus.BAD_REQUEST);
 			}
 		}catch (Exception e) {
@@ -85,8 +85,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public void atualizarLogin(AtualizacaoLoginRequest atualizacaoLoginRequest) {		
-		try{
-			
+		try{			
 			if(!geralUtils.isCpfInvalido(atualizacaoLoginRequest.getCpf().replaceAll("[^0-9]", ""))) {
 			logger.info("Executando o LoginRepository.atualizarLogin");
 			loginRepository.atualizarLogin(atualizacaoLoginRequest);

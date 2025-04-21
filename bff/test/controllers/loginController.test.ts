@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import * as loginService from '@services/loginService';
 import { CustomError } from '@errors/customError';
 import { decriptografia } from '@utils/utils';
-import { validarLogin, validarToken } from '@controllers/loginController';
+import { cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
+import { LoginCadastroDados } from '@models/cadastroLogin';
 
-// Mock das dependências
+// Mocks
 jest.mock('@services/loginService');
 jest.mock('@utils/utils', () => ({
   decriptografia: jest.fn(),
@@ -15,18 +16,24 @@ jest.mock('@utils/utils', () => ({
 }));
 
 describe('loginController', () => {
-  
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {};
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
   describe('validarLogin', () => {
     it('deve retornar status 200 com um token quando a validação for bem-sucedida', async () => {
-      const req = {
+      req = {
         body: { hash: 'valid-hash' },
-      } as unknown as Request;
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
-      
+      };
+
       const mockDecrypted = '{"username":"admin","password":"password"}';
       const mockReturn = {
         status: 200,
@@ -35,64 +42,37 @@ describe('loginController', () => {
         message: 'Login successful',
       };
 
-      // Simulando comportamento da função decriptografia
       (decriptografia as jest.Mock).mockReturnValue(mockDecrypted);
       (loginService.validarLogin as jest.Mock).mockResolvedValue(mockReturn);
 
-      await validarLogin(req, res);
+      await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        token: 'valid-token',
-        expiration: '2025-12-31',
-        status: 200,
-        message: 'Login successful',
-      });
+      expect(res.json).toHaveBeenCalledWith(mockReturn);
     });
 
     it('deve retornar erro 500 quando o hash estiver ausente', async () => {
-      const req = {
-        body: {},
-      } as unknown as Request;
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
+      req = { body: {} };
 
-      await validarLogin(req, res);
+      await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
     });
 
     it('deve retornar erro 500 quando não for possível descriptografar o hash', async () => {
-      const req = {
-        body: { hash: 'invalid-hash' },
-      } as unknown as Request;
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
+      req = { body: { hash: 'invalid-hash' } };
 
       (decriptografia as jest.Mock).mockReturnValue(null);
 
-      await validarLogin(req, res);
+      await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith('Erro ao validar o login');
     });
 
     it('deve retornar status 400 quando o retorno do loginService for inválido', async () => {
-      const req = {
-        body: { hash: 'valid-hash' },
-      } as unknown as Request;
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
+      req = { body: { hash: 'valid-hash' } };
 
       const mockDecrypted = '{"username":"admin","password":"password"}';
       const mockReturn = {
@@ -103,7 +83,7 @@ describe('loginController', () => {
       (decriptografia as jest.Mock).mockReturnValue(mockDecrypted);
       (loginService.validarLogin as jest.Mock).mockResolvedValue(mockReturn);
 
-      await validarLogin(req, res);
+      await validarLogin(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({ message: 'Invalid credentials' });
@@ -112,39 +92,88 @@ describe('loginController', () => {
 
   describe('validarToken', () => {
     it('deve retornar status 200 com verdadeiro quando o token for válido', async () => {
-      const req = {
-        headers: { token: 'valid-token' },
-      } as unknown as Request;
-      
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as unknown as Response;
+      req = { headers: { token: 'valid-token' } };
 
       (loginService.validarToken as jest.Mock).mockResolvedValue(true);
 
-      await validarToken(req, res);
+      await validarToken(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(true);
     });
 
     it('deve retornar status 500 quando houver um erro ao validar o token', async () => {
+      req = { headers: { token: 'invalid-token' } };
+
+      (loginService.validarToken as jest.Mock).mockRejectedValue(new Error('Token invalid'));
+
+      await validarToken(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith('Erro ao validar o token');
+    });
+  });
+
+  describe('cadastrarLogin', () => {
+    it('deve retornar sucesso quando cadastro for efetuado', async () => {
       const req = {
-        headers: { token: 'invalid-token' },
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
       } as unknown as Request;
-      
+    
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as unknown as Response;
 
-      (loginService.validarToken as jest.Mock).mockRejectedValue(new Error('Token invalid'));
+      const retorno = {
+        status: 201,
+        message: 'Cadastro efetuado com sucesso',
+      };
 
-      await validarToken(req, res);
+      (loginService.cadastrarLogin as jest.Mock).mockResolvedValue(retorno);
+
+      await cadastrarLogin(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Cadastro efetuado com sucesso' });
+    });
+
+    it('deve retornar erro quando o cadastro falhar', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+      } as unknown as Request;
+    
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      const retorno = {
+        status: 400,
+        message: 'Erro ao cadastrar o login',
+      };
+
+      (loginService.cadastrarLogin as jest.Mock).mockResolvedValue(retorno);
+
+      await cadastrarLogin(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao cadastrar o login' });
+    });
+
+    it('deve retornar erro 500 caso ocorra um erro inesperado', async () => {
+      (loginService.cadastrarLogin as jest.Mock).mockRejectedValue(new Error('Erro inesperado'));
+
+      await cadastrarLogin({} as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith('Erro ao validar o token');
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao cadastrar o login' });
     });
   });
 });

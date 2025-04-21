@@ -2,8 +2,7 @@ import { environments } from "@environments/environments";
 import { decriptografia, logger } from "@utils/utils";
 import * as forge from 'node-forge';
 
-describe('Teste da função decriptografia', () => {
-    const privateKeyPem = environments.PRIVATE_KEY;
+describe('Teste da função decriptografia', () => {    
 
     it('Deve decriptografar uma mensagem corretamente', () => {
         const hash = 'hashCodificadoEmBase64';
@@ -18,6 +17,26 @@ describe('Teste da função decriptografia', () => {
         
         expect(resultado).toBe('Mensagem Esperada');
     });
+
+    it('deve retornar null e logar erro ao receber erro na decriptação', () => {        
+        const fakePrivateKey = {
+          decrypt: jest.fn().mockImplementationOnce(() => {
+            throw new Error('Falha de decriptação simulada');
+          }),
+        };    
+        
+        jest.spyOn(forge.pki, 'privateKeyFromPem').mockReturnValue(fakePrivateKey as any);
+            
+        const spyLogger = jest.spyOn(logger, 'error').mockImplementation();
+    
+        const resultado = decriptografia('algumHashAqui');
+    
+        expect(resultado).toBeNull();
+        expect(spyLogger).toHaveBeenCalledWith('Erro ao descriptografar');
+    
+        
+        jest.restoreAllMocks();
+      });
 });
 
 describe('Teste do logger', () => {

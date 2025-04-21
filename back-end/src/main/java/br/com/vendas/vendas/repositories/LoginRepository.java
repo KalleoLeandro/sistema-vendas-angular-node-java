@@ -53,6 +53,7 @@ public class LoginRepository {
 		try {
 			namedParameterJdbcTemplate.update(sql, params);
 		} catch (DataAccessException e) {
+			e.printStackTrace();
 			logger.error(e.getMessage());
 			throw new DefaultErrorException("Erro ao gravar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
 		}

@@ -1,5 +1,6 @@
 import Router from "express";
 import * as loginController from "@controllers/loginController";
+import * as middleware from '@middlewares/middleware';
 
 const loginRoutes = Router();
 
@@ -75,16 +76,9 @@ loginRoutes.post("/validar-login", loginController.validarLogin);
  * @swagger
  * /validar-token:
  *   post:
- *     summary: Endpoints de Login
+ *     summary: Login de autenticação
  *     tags:
- *       - Login
- *     parameters:
- *       - in: header
- *         name: authorization
- *         required: true
- *         schema:
- *           type: string
- *         description: Token JWT do usuário
+ *       - Login     
  *     responses:
  *       200:
  *         description: Token testado(pode ser true ou false) 
@@ -103,5 +97,53 @@ loginRoutes.post("/validar-login", loginController.validarLogin);
  *                example: "Erro ao validar o token" 
  */
 loginRoutes.post("/validar-token", loginController.validarToken);
+
+/**
+ * @swagger
+ * /cadastrar-login:
+ *   post:
+ *     summary: Cadastro de Login
+ *     tags:
+ *       - Login    
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: "José da Silva"
+ *               cpf:
+ *                 type: string
+ *                 example: "222.333.444-05"
+ *               login:
+ *                 type: string
+ *                 example: "jose123"
+ *               senha:
+ *                 type: string
+ *                 example: "jose@123"
+ *               perfil:
+ *                 type: string
+ *                 example: "admin"
+ *     responses:
+ *       200:
+ *         description: 
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                     
+ *       500:
+ *         description: Erros ao validar o token * 
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: string 
+ *                example: "Erro ao validar o token" 
+ */
+loginRoutes.post("/cadastrar-login", middleware.verificaTokenValido, loginController.cadastrarLogin);
+
 
 export default loginRoutes;

@@ -1,4 +1,4 @@
-import { createLogger, format, transports } from "winston";
+import { createLogger, format, Logger, transports } from "winston";
 import * as forge from "node-forge";
 
 export const decriptografia = (hash: string) => {
@@ -59,7 +59,7 @@ export const decriptografia = (hash: string) => {
         const mensagem = privateKey.decrypt(forge.util.decode64(hash));
         return mensagem;
     } catch (error) {
-        console.error("Erro ao descriptografar:", error);
+        logger.error("Erro ao descriptografar");
         return null;
     }
 }

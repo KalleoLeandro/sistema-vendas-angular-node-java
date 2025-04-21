@@ -7,6 +7,20 @@ export const swaggerDefinition = {
     version: '1.0.0',
     description: 'Documentação da API',
   },
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
+  },
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   tags: [
     {
       name: 'Teste',

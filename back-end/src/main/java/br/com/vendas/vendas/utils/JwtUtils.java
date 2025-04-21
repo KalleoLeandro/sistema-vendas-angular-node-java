@@ -93,11 +93,12 @@ public class JwtUtils implements Serializable {
 
     public Boolean validateToken(String token) {
         try {
+        	String tokenSanitizado = sanitizeToken(token);
             JwtParser parser = Jwts.parserBuilder()
                     .setSigningKey(getSecretKey())
                     .build();
 
-            parser.parseClaimsJws(sanitizeToken(token));
+            parser.parseClaimsJws(sanitizeToken(tokenSanitizado));
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
