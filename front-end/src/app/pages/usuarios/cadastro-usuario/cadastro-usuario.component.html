@@ -25,8 +25,8 @@
                     <label>
                         CPF
                     </label>
-                    <input type="text" formControlName="cpf" class="form-control" mask="000.000.000-00">
-                       <!-- (blur)="cpfValido()"-->
+                    <input type="text" formControlName="cpf" class="form-control" mask="000.000.000-00"
+                       (blur)="cpfValido()">
                     <small *ngIf="cadastroForm.controls['cpf'].touched && cadastroForm.controls['cpf'].invalid"
                         class="text-danger">Campo obrigatório</small>
                     <small *ngIf="cpfInvalido" class="text-danger">CPF inválido</small>
@@ -43,7 +43,7 @@
                     <label>
                         Senha
                     </label>
-                    <input type="text" formControlName="senha" class="form-control" name="senha" required>
+                    <input type="password" formControlName="senha" class="form-control" name="senha" required>
                     <small *ngIf="cadastroForm.controls['senha'].touched && cadastroForm.controls['senha'].invalid"
                         class="text-danger">Campo obrigatório</small>
                 </div>
@@ -57,9 +57,8 @@
                 <small *ngIf="cadastroForm.controls['perfil'].touched && cadastroForm.controls['perfil'].invalid"
                     class="text-danger">Campo obrigatório</small>
                 <div class="botoes mt-5 mb-3">
-                    <!--[disabled]="cadastroForm.invalid"-->
-                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid">
-                        <!--(click)="cadastrarAtualizarUsuario()">-->
+                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid"
+                        (click)="$event.preventDefault(); cadastrarAtualizarUsuario()">
                         Cadastrar</button>
                     <button class="btn btn-warning" (click)="$event.preventDefault(); limparFormulario()">Limpar
                         Formulário</button>

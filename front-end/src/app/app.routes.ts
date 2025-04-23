@@ -20,7 +20,7 @@ export const routes: Routes = [
             {
                 path: 'usuarios', children: [
                     { path: 'cadastro', loadComponent: () => import("@pages/usuarios/cadastro-usuario/cadastro-usuario.component").then(c => c.CadastroUsuarioComponent)},
-                    //{ path: 'cadastro/:id', component: CadastroUsuarioComponent },
+                    { path: 'cadastro/:id', loadComponent: () => import("@pages/usuarios/cadastro-usuario/cadastro-usuario.component").then(c => c.CadastroUsuarioComponent)},
                     //{ path: 'lista', component: ListarUsuarioComponent }
                 ]
             },
