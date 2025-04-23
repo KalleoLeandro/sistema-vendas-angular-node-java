@@ -3,6 +3,7 @@ package br.com.vendas.vendas.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import br.com.vendas.vendas.models.dto.LoginDTO;
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
+import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.repositories.LoginRepository;
 import br.com.vendas.vendas.services.LoginService;
@@ -93,6 +95,22 @@ public class LoginServiceImpl implements LoginService {
 				throw new DefaultErrorException("Cpf inválido", HttpStatus.BAD_REQUEST);
 			}
 		}catch (Exception e) {
+			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public LoginCadastroResponse buscarPorId(Integer id) {
+		try{
+			if(id == 1) {
+				throw new DefaultErrorException("Erro ao recuperar os dados do login", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			logger.info("Executando o LoginRepository.buscarPorId");
+			return loginRepository.buscarPorId(id);			
+		}catch (EmptyResultDataAccessException e) {
+	        logger.warn("Nenhum usuário encontrado com o id informado", id);
+	        throw new DefaultErrorException("Usuário não encontrado", HttpStatus.NO_CONTENT);
+	    } catch (Exception e) {
 			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

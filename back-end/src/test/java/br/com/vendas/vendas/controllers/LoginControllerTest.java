@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
+import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.services.impl.LoginServiceImpl;
 
@@ -36,6 +37,8 @@ public class LoginControllerTest {
 	private  CadastroLoginRequest cadastroLoginRequest; 
 	
 	private AtualizacaoLoginRequest atualizacaoLoginRequest;
+	
+	private LoginCadastroResponse loginCadastroResponse;
 	
 	@BeforeEach
     public void setup() {
@@ -64,9 +67,13 @@ public class LoginControllerTest {
         atualizacaoLoginRequest.setSenha("password");
         atualizacaoLoginRequest.setPerfil("dev");
         
-        
-        
-       
+        loginCadastroResponse = new LoginCadastroResponse();
+        loginCadastroResponse.setId(1);
+        loginCadastroResponse.setNome("teste");
+        loginCadastroResponse.setCpf("22233344405");
+        loginCadastroResponse.setLogin("user");
+        loginCadastroResponse.setSenha("password");
+        loginCadastroResponse.setPerfil("dev");
     }
 	
 	@Test
@@ -97,5 +104,13 @@ public class LoginControllerTest {
 		Mockito.doNothing().when(service).atualizarLogin(any());
 		ResponseEntity<Void> response = controller.atualizarLogin(atualizacaoLoginRequest);
 		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());		
+	}
+	
+	@Test
+	public void testBuscarPorIdOk() {
+		Mockito.when(service.buscarPorId(any())).thenReturn(loginCadastroResponse);
+		ResponseEntity<LoginCadastroResponse> response = controller.buscarPorId(1);
+		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+		Assertions.assertNotNull(response.getBody());
 	}
 }

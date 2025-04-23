@@ -195,4 +195,67 @@ loginRoutes.post("/cadastrar-login", middleware.verificaTokenValido, loginContro
  */
 loginRoutes.put("/atualizar-login", middleware.verificaTokenValido, loginController.atualizarLogin);
 
+/**
+ * @swagger
+ * /buscar-por-id/{id}:
+ *   get:
+ *     summary: Buscar Login por ID
+ *     tags:
+ *       - Login
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do login a ser localizado
+ *     responses:
+ *       200:
+ *         description: Login encontrado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ *                   example: 10
+ *                 nome:
+ *                   type: string
+ *                   example: "José da Silva"
+ *                 cpf:
+ *                   type: string
+ *                   example: "222.333.444-05"
+ *                 login:
+ *                   type: string
+ *                   example: "jose123"
+ *                 senha:
+ *                   type: string
+ *                   example: "jose@123"
+ *                 perfil:
+ *                   type: string
+ *                   example: "admin"
+ *       204:
+ *         description: Login não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Usuário não localizado"
+ *       500:
+ *         description: Erro ao buscar o login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erro ao buscar o login"
+ */
+loginRoutes.get("/buscar-por-id/:id", middleware.verificaTokenValido, loginController.buscarPorId);
+
 export default loginRoutes;

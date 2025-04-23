@@ -1,13 +1,15 @@
 package br.com.vendas.vendas.controllers;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import br.com.vendas.vendas.exceptions.schemas.DefaultErrorResponse;
 import br.com.vendas.vendas.services.UtilsService;
@@ -35,7 +37,7 @@ public class UtilsController {
 			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
 	@PostMapping("/validar-cpf")
-	public ResponseEntity<Boolean> validarCpf(@RequestBody @Valid String cpf) {	
+	public ResponseEntity<Map<String, Boolean>> validarCpf(@RequestBody @Valid String cpf) {	
 		logger.info("Executando a service validarCpf");		
 		return ResponseEntity.ok(utilsService.validarCpf(cpf));
 	}

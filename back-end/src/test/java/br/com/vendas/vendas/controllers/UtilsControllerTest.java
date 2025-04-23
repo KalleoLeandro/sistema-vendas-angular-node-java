@@ -2,6 +2,8 @@ package br.com.vendas.vendas.controllers;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,8 +28,8 @@ public class UtilsControllerTest {
 	
 	@Test
 	public void testCpfValidado() {
-		Mockito.when(service.validarCpf(anyString())).thenReturn(true);
-		ResponseEntity<Boolean> response = controller.validarCpf("222.333.444-05");		
+		Mockito.when(service.validarCpf(anyString())).thenReturn(Map.of("valido", true));
+		ResponseEntity<Map<String, Boolean>> response = controller.validarCpf("222.333.444-05");		
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 }

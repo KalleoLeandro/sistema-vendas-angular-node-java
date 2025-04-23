@@ -17,6 +17,7 @@
 
     <!-- Logger para capturar todos os logs e direcionar para o appender FILE -->
     <logger name="ROOT" level="INFO">
+        <appender-ref ref="Console"/>    
         <appender-ref ref="FILE" />
     </logger>
 

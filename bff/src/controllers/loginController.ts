@@ -78,3 +78,20 @@ export const atualizarLogin = async (req: Request, res: Response) => {
         res.status(500).json({message: "Erro ao atualizar o login"});
     }
 }
+
+export const buscarPorId = async(req:Request, res:Response) =>{
+    try {
+        const id: string = req.params.id;
+        const token: string = req.headers.authorization as string;        
+        const cadastroLogin = await loginService.buscarPorId(id, token);
+        if(cadastroLogin.status === 200){            
+            res.status(cadastroLogin.status).json(cadastroLogin.response);
+        } else {            
+            res.status(cadastroLogin.status).json(cadastroLogin.message);
+        }
+        
+    } catch (error:any) {
+        log.error(`Erro: ${error}`);
+        res.status(500).json({message: "Erro ao atualizar o login"});
+    }
+}

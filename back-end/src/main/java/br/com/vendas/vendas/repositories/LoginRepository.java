@@ -15,6 +15,7 @@ import br.com.vendas.vendas.exceptions.DefaultErrorException;
 import br.com.vendas.vendas.models.dto.LoginDTO;
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
+import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
 
 @Repository
 public class LoginRepository {
@@ -24,8 +25,12 @@ public class LoginRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	final RowMapper<LoginDTO> loginRowMapper = (rs, rowNum) -> LoginDTO.builder().nome(rs.getString("nome"))
+	final RowMapper<LoginDTO> loginMapper = (rs, rowNum) -> LoginDTO.builder().nome(rs.getString("nome"))
 			.cpf(rs.getString("cpf")).perfil(rs.getString("perfil")).build();
+
+	final RowMapper<LoginCadastroResponse> loginCadastroMapper = (rs, rowNum) -> LoginCadastroResponse.builder()
+			.id(rs.getInt("id")).nome(rs.getString("nome")).cpf(rs.getString("cpf")).login(rs.getString("login"))
+			.senha(rs.getString("senha")).perfil(rs.getString("perfil")).build();
 
 	public LoginDTO buscarPorLoginESenha(String login, String senha) {
 
@@ -34,7 +39,7 @@ public class LoginRepository {
 		MapSqlParameterSource params = new MapSqlParameterSource().addValue("login", login).addValue("senha", senha);
 
 		try {
-			return namedParameterJdbcTemplate.<LoginDTO>queryForObject(sql, params, loginRowMapper);
+			return namedParameterJdbcTemplate.<LoginDTO>queryForObject(sql, params, loginMapper);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		} catch (DataAccessException e) {
@@ -61,10 +66,9 @@ public class LoginRepository {
 
 	public void atualizarLogin(AtualizacaoLoginRequest atualizacaoLoginRequest) {
 		String sql = "UPDATE usuarios set nome = :nome,cpf = :cpf, login = :login, senha = :senha, perfil = :perfil where id = :id";
-		MapSqlParameterSource params = new MapSqlParameterSource()
-				.addValue("id", atualizacaoLoginRequest.getId())
-				.addValue("nome", atualizacaoLoginRequest.getNome())
-				.addValue("cpf", atualizacaoLoginRequest.getCpf()).addValue("login", atualizacaoLoginRequest.getLogin())
+		MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", atualizacaoLoginRequest.getId())
+				.addValue("nome", atualizacaoLoginRequest.getNome()).addValue("cpf", atualizacaoLoginRequest.getCpf())
+				.addValue("login", atualizacaoLoginRequest.getLogin())
 				.addValue("senha", atualizacaoLoginRequest.getSenha())
 				.addValue("perfil", atualizacaoLoginRequest.getPerfil());
 
@@ -73,6 +77,20 @@ public class LoginRepository {
 		} catch (DataAccessException e) {
 			logger.error(e.getMessage());
 			throw new DefaultErrorException("Erro ao gravar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public LoginCadastroResponse buscarPorId(Integer id) {
+		String sql = "SELECT * FROM usuarios where id = :id";
+		MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
+		try {
+			return namedParameterJdbcTemplate.<LoginCadastroResponse>queryForObject(sql, params, loginCadastroMapper);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error(e.getMessage());
+			throw new EmptyResultDataAccessException("Erro ao localizar os dados na base", 1);
+		}catch (DataAccessException e) {
+			logger.error(e.getMessage());
+			throw new DefaultErrorException("Erro ao localizar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

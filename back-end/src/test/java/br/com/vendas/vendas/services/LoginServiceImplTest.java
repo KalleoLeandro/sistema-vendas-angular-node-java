@@ -3,6 +3,7 @@ package br.com.vendas.vendas.services;
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -22,6 +24,7 @@ import br.com.vendas.vendas.models.dto.LoginDTO;
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
+import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
 import br.com.vendas.vendas.models.responses.LoginResponse;
 import br.com.vendas.vendas.repositories.LoginRepository;
 import br.com.vendas.vendas.services.impl.LoginServiceImpl;
@@ -44,6 +47,19 @@ class LoginServiceImplTest {
 
 	@Mock
 	private GeralUtils geralUtils;
+
+	private LoginCadastroResponse loginCadastroResponse;
+
+	@BeforeEach
+	public void setup() {
+		loginCadastroResponse = new LoginCadastroResponse();
+		loginCadastroResponse.setId(1);
+		loginCadastroResponse.setNome("teste");
+		loginCadastroResponse.setCpf("22233344405");
+		loginCadastroResponse.setLogin("user");
+		loginCadastroResponse.setSenha("password");
+		loginCadastroResponse.setPerfil("dev");
+	}
 
 	private CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05",
 			"teste_user", "123456", "dev");
@@ -83,7 +99,7 @@ class LoginServiceImplTest {
 		LoginRequest request = new LoginRequest("admin-teste", "123");
 		LoginDTO dto = new LoginDTO();
 		dto.setNome("Admin Teste");
-		dto.setPerfil("ROLE_ADMIN"); // Perfil admin
+		dto.setPerfil("ROLE_ADMIN");
 
 		Mockito.when(loginRepository.buscarPorLoginESenha("admin-teste", "123")).thenReturn(dto);
 		Mockito.when(jwtUtils.generateToken(anyString(), anyString(), anyString())).thenReturn("token-abc");
@@ -105,7 +121,7 @@ class LoginServiceImplTest {
 		LoginRequest request = new LoginRequest("dev-teste", "123");
 		LoginDTO dto = new LoginDTO();
 		dto.setNome("Dev Teste");
-		dto.setPerfil("ROLE_DEV"); // Perfil dev
+		dto.setPerfil("ROLE_DEV");
 
 		Mockito.when(loginRepository.buscarPorLoginESenha("dev-teste", "123")).thenReturn(dto);
 		Mockito.when(jwtUtils.generateToken(anyString(), anyString(), anyString())).thenReturn("token-abc");
@@ -267,4 +283,36 @@ class LoginServiceImplTest {
 		Assertions.assertEquals("Erro ao gravar os dados na base", exception.getMessage());
 	}
 
+	@Test
+	void testBuscarPorIdOk() {
+		Mockito.when(loginRepository.buscarPorId(anyInt())).thenReturn(loginCadastroResponse);
+
+		LoginCadastroResponse response = loginService.buscarPorId(2);
+		Assertions.assertNotNull(response);
+		Mockito.verify(loginRepository, Mockito.times(1)).buscarPorId(anyInt());
+	}
+	
+	@Test
+	void testBuscarPorIdNoFound() {
+		Mockito.when(loginRepository.buscarPorId(Mockito.anyInt()))
+	       .thenThrow(new EmptyResultDataAccessException("Nenhum usuário encontrado com o id informado", 1));
+
+		
+		DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+			loginService.buscarPorId(2);
+		});
+		
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, exception.getStatus());
+		Assertions.assertEquals("Usuário não encontrado", exception.getMessage());
+	}
+
+	@Test
+	void testBuscarPorIdFalhaAoBuscarIdMaster() {
+		DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+			loginService.buscarPorId(1);
+		});
+		
+		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
+		Assertions.assertEquals("Erro ao recuperar os dados do login", exception.getMessage());
+	}
 }

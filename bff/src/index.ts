@@ -9,6 +9,7 @@ import { options } from "configs/swagger";
 import testeRoutes from "@routes/testeRoutes";
 import cors from "cors";
 import loginRoutes from "@routes/loginRoutes";
+import utilsRoutes from "@routes/utilsRoutes";
 
 const server = express();
 
@@ -29,6 +30,7 @@ server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 server.use(testeRoutes);
 server.use(loginRoutes);
+server.use(utilsRoutes);
 
 server.use((req: Request, res: Response) => {
     res.status(404).json('Recurso não encontrado!');
