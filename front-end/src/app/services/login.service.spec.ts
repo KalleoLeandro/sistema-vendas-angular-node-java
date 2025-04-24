@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { LoginService } from './login.service';
 import { LoginReponse } from '@models/LoginReponse';
 import { environment } from 'environments/environment';
+import { FormControl, FormGroup } from '@angular/forms';
 
 describe('LoginService', () => {
   let service: LoginService;
@@ -12,6 +13,7 @@ describe('LoginService', () => {
   beforeEach(() => {
 
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
+    
 
 
     TestBed.configureTestingModule({
@@ -73,11 +75,11 @@ describe('LoginService', () => {
     it('deve chamar o método post do HttpClient com token e retornar um valor booleano', (done) => {
       const token = 'test_token';
       const mockResponse = true;
-      
+
       httpClientSpy.post.and.returnValue(of(mockResponse));
-      
+
       service.validarToken(token).subscribe({
-        next: (result) => {            
+        next: (result) => {
           expect(result).toBe(mockResponse);
           done();
         },
@@ -113,5 +115,145 @@ describe('LoginService', () => {
       });
     });
   });
+
+  describe('getPerfil', () => {
+    it('deve chamar post com o token correto e retornar true', (done) => {
+      const token = 'token123';
+      const mockResponse = true;
+  
+      httpClientSpy.post.and.returnValue(of(mockResponse));
+  
+      service.getPerfil(token).subscribe(res => {
+        expect(httpClientSpy.post).toHaveBeenCalledWith(
+          `${environment.BFF}/retorna-perfil`,
+          null,
+          jasmine.objectContaining({
+            headers: jasmine.any(HttpHeaders)
+          })
+        );
+        expect(res).toBe(true);
+        done();
+      });
+    });
+  
+    it('deve lidar com erro ao chamar getPerfil', (done) => {
+      const token = 'token123';
+      const error = new HttpErrorResponse({ status: 403 });
+  
+      httpClientSpy.post.and.returnValue(throwError(() => error));
+  
+      service.getPerfil(token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(403);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('buscarUsuarioPorId', () => {
+    it('deve fazer GET com id e token e retornar resultado', (done) => {
+      const token = 'token';
+      const id = 1;
+      const mockResponse = { nome: 'João' };
+  
+      httpClientSpy.get = jasmine.createSpy().and.returnValue(of(mockResponse));
+  
+      service.buscarUsuarioPorId(id, token).subscribe(res => {
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+          `${environment.BFF}/buscar-por-id/${id}`,
+          jasmine.anything()
+        );
+        expect(res).toEqual(mockResponse);
+        done();
+      });
+    });
+  
+    it('deve tratar erro ao buscar usuário por ID', (done) => {
+      const token = 'token';
+      const id = 1;
+      const error = new HttpErrorResponse({ status: 404 });
+  
+      httpClientSpy.get = jasmine.createSpy().and.returnValue(throwError(() => error));
+  
+      service.buscarUsuarioPorId(id, token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(404);
+          done();
+        }
+      });
+    });
+  });
+  
+  describe('atualizarUsuario', () => {
+    it('deve fazer PUT com formulário e retornar resultado', (done) => {
+      const token = 'token';
+      const form = new FormGroup({ nome: new FormControl('Maria') });
+      const mockResponse = { atualizado: true };
+  
+      httpClientSpy.put = jasmine.createSpy().and.returnValue(of(mockResponse));
+  
+      service.atualizarUsuario(form, token).subscribe(res => {
+        expect(httpClientSpy.put).toHaveBeenCalledWith(
+          `${environment.BFF}/atualizar-login`,
+          form.getRawValue(),
+          jasmine.anything()
+        );
+        expect(res).toEqual(mockResponse);
+        done();
+      });
+    });
+  
+    it('deve tratar erro ao atualizar usuário', (done) => {
+      const token = 'token';
+      const form = new FormGroup({ nome: new FormControl('Maria') });
+      const error = new HttpErrorResponse({ status: 400 });
+  
+      httpClientSpy.put = jasmine.createSpy().and.returnValue(throwError(() => error));
+  
+      service.atualizarUsuario(form, token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(400);
+          done();
+        }
+      });
+    });
+  });
+  
+  describe('cadastrarUsuario', () => {
+    it('deve fazer POST com formulário e retornar resultado', (done) => {
+      const token = 'token';
+      const form = new FormGroup({ nome: new FormControl('João') });
+      const mockResponse = { cadastrado: true };
+  
+      httpClientSpy.post.and.returnValue(of(mockResponse));
+  
+      service.cadastrarUsuario(form, token).subscribe(res => {
+        expect(httpClientSpy.post).toHaveBeenCalledWith(
+          `${environment.BFF}/cadastrar-login`,
+          form.getRawValue(),
+          jasmine.anything()
+        );
+        expect(res).toEqual(mockResponse);
+        done();
+      });
+    });
+  
+    it('deve tratar erro ao cadastrar usuário', (done) => {
+      const token = 'token';
+      const form = new FormGroup({ nome: new FormControl('João') });
+      const error = new HttpErrorResponse({ status: 409 });
+  
+      httpClientSpy.post.and.returnValue(throwError(() => error));
+  
+      service.cadastrarUsuario(form, token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(409);
+          done();
+        }
+      });
+    });
+  });
 });
+
 

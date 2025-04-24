@@ -9,6 +9,7 @@ import { NgxMaskDirective } from 'ngx-mask';
 @Component({
   selector: 'app-cadastro-usuario',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxMaskDirective],
+  standalone: true,
   templateUrl: './cadastro-usuario.component.html',
   styleUrl: './cadastro-usuario.component.css'
 })
