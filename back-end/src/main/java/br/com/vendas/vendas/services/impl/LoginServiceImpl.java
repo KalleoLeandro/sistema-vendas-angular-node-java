@@ -1,5 +1,7 @@
 package br.com.vendas.vendas.services.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +112,19 @@ public class LoginServiceImpl implements LoginService {
 		}catch (EmptyResultDataAccessException e) {
 	        logger.warn("Nenhum usuário encontrado com o id informado", id);
 	        throw new DefaultErrorException("Usuário não encontrado", HttpStatus.NO_CONTENT);
+	    } catch (Exception e) {
+			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public List<LoginCadastroResponse> listarPorPagina(Integer limit, Integer offset) {
+		try{			
+			logger.info("Executando o LoginRepository.listarPorPagina");
+			return loginRepository.listarPorPagina(limit, offset);			
+		}catch (EmptyResultDataAccessException e) {
+	        logger.warn("Sem itens retornado", limit, offset);
+	        throw new DefaultErrorException("Sem itens retornado", HttpStatus.NO_CONTENT);
 	    } catch (Exception e) {
 			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

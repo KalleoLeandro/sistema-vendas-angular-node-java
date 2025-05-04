@@ -34,4 +34,15 @@ secret:
 
 jwt:
   token:
-    validity: 1200000		
+    validity: 1200000	
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health, metrics, prometheus"      
+      endpoint:
+        health:
+          show-details: always
+  prometheus:
+    enabled: true

@@ -2,6 +2,9 @@ package br.com.vendas.vendas.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,6 +113,16 @@ public class LoginControllerTest {
 	public void testBuscarPorIdOk() {
 		Mockito.when(service.buscarPorId(any())).thenReturn(loginCadastroResponse);
 		ResponseEntity<LoginCadastroResponse> response = controller.buscarPorId(1);
+		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+		Assertions.assertNotNull(response.getBody());
+	}
+	
+	@Test
+	public void testListaPorPaginaOk() {
+		List<LoginCadastroResponse> lista = new ArrayList<LoginCadastroResponse>();
+		lista.add(loginCadastroResponse);
+		Mockito.when(service.listarPorPagina(any(), any())).thenReturn(lista);
+		ResponseEntity<List<LoginCadastroResponse>> response = controller.listarPorPagina(10,1);
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertNotNull(response.getBody());
 	}

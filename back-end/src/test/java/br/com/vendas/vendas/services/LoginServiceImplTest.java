@@ -1,10 +1,11 @@
 package br.com.vendas.vendas.services;
 
-import java.util.Date;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+
+import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -315,4 +316,58 @@ class LoginServiceImplTest {
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatus());
 		Assertions.assertEquals("Erro ao recuperar os dados do login", exception.getMessage());
 	}
+	
+	@Test
+	void testListarPorPagina_Sucesso() {
+	    // Cria um mock de resposta
+	    LoginCadastroResponse loginMock = LoginCadastroResponse.builder()
+	        .id(2)
+	        .nome("Nome Teste")
+	        .cpf("12345678901")
+	        .login("teste")
+	        .senha("teste123")
+	        .perfil("user")
+	        .build();
+
+	    List<LoginCadastroResponse> listaMockada = List.of(loginMock);
+
+	    Mockito.when(loginRepository.listarPorPagina(10, 0)).thenReturn(listaMockada);
+
+	    List<LoginCadastroResponse> resultado = loginService.listarPorPagina(10, 0);
+	    
+	    Assertions.assertNotNull(resultado);
+	    Assertions.assertEquals(1, resultado.size());
+	    Assertions.assertEquals("Nome Teste", resultado.get(0).getNome());
+	    Assertions.assertEquals("teste", resultado.get(0).getLogin());
+	    Assertions.assertEquals("user", resultado.get(0).getPerfil());
+	}
+
+	
+	@Test
+	void testListarPorPagina_SemItensRetornados() {
+	    Mockito.when(loginRepository.listarPorPagina(Mockito.anyInt(), Mockito.anyInt()))
+	           .thenThrow(new EmptyResultDataAccessException(1));
+
+	    DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+	        loginService.listarPorPagina(10, 1);
+	    });
+
+	    Assertions.assertEquals("Sem itens retornado", ex.getMessage());
+	    Assertions.assertEquals(HttpStatus.NO_CONTENT, ex.getStatus());
+	}
+	
+	@Test
+	void testListarPorPagina_ErroInesperado() {
+	    Mockito.when(loginRepository.listarPorPagina(Mockito.anyInt(), Mockito.anyInt()))
+	           .thenThrow(new RuntimeException("Erro inesperado"));
+
+	    DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+	        loginService.listarPorPagina(10, 1);
+	    });
+
+	    Assertions.assertEquals("Erro inesperado", ex.getMessage());
+	    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
+	}
+
+
 }

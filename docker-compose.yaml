@@ -59,11 +59,93 @@ services:
     depends_on:
       - bff
     volumes:
-      - ${PWD}/front-end    
-      
+      - ${PWD}/front-end
+
+  prometheus:
+    container_name: sistema_vendas_prometheus
+    image: prom/prometheus:latest
+    depends_on:
+      - back-end
+    ports:
+      - "9091:9090"
+    networks:
+      - minharede
+    volumes:
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+
+  grafana:
+    container_name: sistema_vendas_grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    networks:
+      - minharede
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonar
+    ports:
+      - "9001:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+    networks:
+      - minharede
+
+  sonar-init:
+    image: appropriate/curl
+    depends_on:
+      - sonarqube
+    networks:
+      - minharede
+    volumes:
+      - sonar-token:/sonar-token
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "
+      echo 'Aguardando SonarQube subir...';
+      until curl -s http://sonarqube:9000/api/system/status | grep -q '\"status\":\"UP\"'; do sleep 5; done;
+      echo 'Sonar está pronto. Criando token...';
+      curl -u admin:admin -X POST http://sonarqube:9000/api/user_tokens/generate -d 'name=meu-token' | grep -o '\"token\":\"[^\"]*\"' | cut -d '\"' -f4 > /sonar-token/token.txt;
+      echo 'Token gerado:';
+      cat /sonar-token/token.txt;
+      "
+
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli
+    container_name: sonar-runner
+    depends_on:
+      - sonar-init
+    networks:
+      - minharede
+    working_dir: /usr/src
+    volumes:
+      - ./back-end:/usr/src/back-end
+      - ./bff:/usr/src/bff
+      - ./front-end:/usr/src/front-end
+      - sonar-token:/sonar-token
+    entrypoint: >
+      bash -c "
+        TOKEN=$(cat /sonar-token/token.txt);
+        echo 'Rodando análise do back-end';
+        cd back-end && sonar-scanner -Dsonar.login=$TOKEN;
+        echo 'Rodando análise do bff';
+        cd ../bff && sonar-scanner -Dsonar.login=$TOKEN;
+        echo 'Rodando análise do front-end';
+        cd ../front-end && sonar-scanner -Dsonar.login=$TOKEN;
+      "
+
 networks:
   minharede:
     driver: bridge
 
 volumes:
   mysql-data:
+  prometheus-data:
+  grafana_data:
+  sonarqube_data:
+  sonar-token:

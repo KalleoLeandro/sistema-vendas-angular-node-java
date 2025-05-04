@@ -1,5 +1,8 @@
 package br.com.vendas.vendas.repositories;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,4 +96,22 @@ public class LoginRepository {
 			throw new DefaultErrorException("Erro ao localizar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	public List<LoginCadastroResponse> listarPorPagina(Integer limit, Integer offset) {
+		String sql = "SELECT * FROM usuarios WHERE id != 1  LIMIT :limit OFFSET :offset";		
+	    MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", limit).addValue("offset", (offset - 1) * limit);
+	    
+	    try {
+	        return namedParameterJdbcTemplate.query(sql, params, loginCadastroMapper);
+	    } catch (EmptyResultDataAccessException e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        return Collections.emptyList();
+	    } catch (DataAccessException e) {
+	        logger.error(e.getMessage());
+	        e.printStackTrace();
+	        throw new DefaultErrorException("Erro ao localizar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+
 }

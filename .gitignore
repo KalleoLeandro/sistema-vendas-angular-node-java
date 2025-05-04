@@ -41,6 +41,7 @@ hs_err_pid*
 /bff/coverage/
 /bff/.eslintcache
 /bff/.npm/
+/bff/.scannerwork/
 /bff/npm-debug.log*
 /bff/yarn-debug.log*
 /bff/yarn-error.log*
@@ -56,6 +57,7 @@ hs_err_pid*
 /front-end/.angular/cache/
 /front-end/.angular/config.json
 /front-end/coverage/
+/front-end/.scannerwork/
 
 # Angular build artifacts
 *.js.map

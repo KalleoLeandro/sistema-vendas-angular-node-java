@@ -15,15 +15,19 @@
         </encoder>
     </appender>
 
-    <!-- Logger para capturar todos os logs e direcionar para o appender FILE -->
-    <logger name="ROOT" level="INFO">
-        <appender-ref ref="Console"/>    
-        <appender-ref ref="FILE" />
+    <!-- Logger para capturar logs da aplicação e direcionar para o FILE appender -->
+    <logger name="org.springframework.boot.actuate" level="WARN">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
-    <!-- Configura o ROOT logger para também enviar logs para o console -->
+    <!-- Logger global, configurando o nível de log para a aplicação -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
+
+    <!-- Exemplo de como silenciar logs de outros pacotes, como Spring, se necessário -->
+    <logger name="org.springframework" level="WARN"/>
+
 </configuration>

@@ -1,5 +1,7 @@
 package br.com.vendas.vendas.services;
 
+import java.util.List;
+
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.requests.LoginRequest;
@@ -17,5 +19,7 @@ public interface LoginService {
 	public void atualizarLogin(AtualizacaoLoginRequest atualizacaoLoginRequest);
 
 	public LoginCadastroResponse buscarPorId(Integer id);
+
+	public List<LoginCadastroResponse> listarPorPagina(Integer limit, Integer offset);
 
 }

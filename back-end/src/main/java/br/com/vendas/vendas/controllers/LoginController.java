@@ -1,5 +1,7 @@
 package br.com.vendas.vendas.controllers;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.vendas.vendas.exceptions.schemas.DefaultErrorResponse;
@@ -27,8 +30,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @Tag(name = "Login", description = "Endpoints de login e token")
@@ -100,6 +103,18 @@ public class LoginController {
 	public ResponseEntity<LoginCadastroResponse> buscarPorId(@PathVariable Integer id) {
 		logger.info("Executando a LoginService.buscarPorId");
 		return ResponseEntity.status(HttpStatus.OK).body(loginService.buscarPorId(id));
+	}
+	
+	@Operation(summary = "Buscar uma página de logins com base na pagina fornecida", description = "Buscar um login com base em um id fornecido", security = @SecurityRequirement(name = "bearerAuth"))
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Login localizado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CadastroLoginRequest.class))),
+			@ApiResponse(responseCode = "204", description = "Sem itens retornado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class), examples = @ExampleObject(summary = "Exemplo de usuário não localizado", value = "{\"timestamp\": \"2025-04-19T15:30:00\", \"message\": \"Sem itens retornado\", \"status\": 204}"))),
+			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
+	@GetMapping("/listar-todos-por-pagina")
+	public ResponseEntity<List<LoginCadastroResponse>> listarPorPagina(@RequestParam Integer limit, @RequestParam Integer offset) {
+		logger.info("Executando a LoginService.listarPorPagina");
+		return ResponseEntity.status(HttpStatus.OK).body(loginService.listarPorPagina(limit, offset));
 	}
 
 }

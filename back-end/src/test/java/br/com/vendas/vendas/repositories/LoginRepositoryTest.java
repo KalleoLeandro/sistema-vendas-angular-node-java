@@ -1,6 +1,8 @@
 package br.com.vendas.vendas.repositories;
 
 import java.sql.ResultSet;
+import java.util.Collections;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -15,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
@@ -230,4 +233,78 @@ class LoginRepositoryTest {
 		Assertions.assertEquals("Erro ao localizar os dados na base", ex.getMessage());
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	void testListaPorPagina_Success() throws Exception {
+	    LoginCadastroResponse mockResponse = LoginCadastroResponse.builder()
+	        .id(2)
+	        .nome("Nome Teste")
+	        .cpf("12345678901")
+	        .login("teste")
+	        .senha("teste123")
+	        .perfil("user")
+	        .build();
+
+	    List<LoginCadastroResponse> mockList = List.of(mockResponse);
+
+	    Mockito.when(namedParameterJdbcTemplate.query(
+	        Mockito.anyString(),
+	        Mockito.any(MapSqlParameterSource.class),
+	        Mockito.any(RowMapper.class)
+	    )).thenReturn(mockList);
+
+	    List<LoginCadastroResponse> result = loginRepository.listarPorPagina(10, 1);
+
+	    Assertions.assertNotNull(result);
+	    Assertions.assertEquals(2, result.get(0).getId());	    
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	void testListaPorPagina_EmptyResult() {
+	    Mockito.when(namedParameterJdbcTemplate.query(
+	        Mockito.anyString(),
+	        Mockito.any(MapSqlParameterSource.class),
+	        Mockito.any(RowMapper.class)
+	    )).thenReturn(Collections.emptyList());
+
+	    List<LoginCadastroResponse> result = loginRepository.listarPorPagina(10, 1);
+
+	    Assertions.assertNotNull(result);
+	    Assertions.assertTrue(result.isEmpty(), "A lista deve estar vazia");
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	void testListaPorPagina_DataAccessException() {
+	    Mockito.when(namedParameterJdbcTemplate.query(
+	        Mockito.anyString(),
+	        Mockito.any(MapSqlParameterSource.class),
+	        Mockito.any(RowMapper.class)
+	    )).thenThrow(new DataAccessResourceFailureException("Erro simulado"));
+
+	    DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
+	        loginRepository.listarPorPagina(10, 1);
+	    });
+
+	    Assertions.assertEquals("Erro ao localizar os dados na base", exception.getMessage());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	void testListaPorPagina_EmptyDataAccessExcepition() {
+	    Mockito.when(namedParameterJdbcTemplate.query(
+	        Mockito.anyString(),
+	        Mockito.any(MapSqlParameterSource.class),
+	        Mockito.any(RowMapper.class)
+	    )).thenThrow(new EmptyResultDataAccessException("Erro simulado", 1));
+
+	    List<LoginCadastroResponse> lista = loginRepository.listarPorPagina(10,1);
+
+	    Assertions.assertEquals(0, lista.size());
+	}
+
+
+
 }
