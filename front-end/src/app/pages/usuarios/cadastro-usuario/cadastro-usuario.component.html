@@ -1,17 +1,15 @@
 <!-- Begin Page Content -->
-<div class="container-fluid">
-
-    <!-- Page Heading -->
-    <!--<h1 class="h3 mb-2 text-gray-800">Cadastro de Usuário</h1>-->
+<div class="container-fluid">      
+    <!-- Page Heading -->        
     <div class="card mb-4">
         <div class="card-header py-3 mb-2">
-            <h6 class="m-0 font-weight-bold text-success">Cadastro de Usuários</h6>
+            <h6 class="m-0 font-weight-bold text-secondary">Cadastro de Usuários</h6>
         </div>
         <div class="col-12">
             <form [formGroup]="cadastroForm">
                 <input type="text" name="id" id="id" formControlName="id">
                 <div class="card-header py-3 mb-2">
-                    <h6 class="m-0 font-weight-bold text-success">Dados Pessoais</h6>
+                    <h6 class="m-0 font-weight-bold text-secondary">Dados Pessoais</h6>
                 </div>
                 <div class="form-group">
                     <label>
@@ -26,11 +24,11 @@
                         CPF
                     </label>
                     <input type="text" formControlName="cpf" class="form-control" mask="000.000.000-00"
-                       (blur)="cpfValido()">
+                        (blur)="cpfValido()">
                     <small *ngIf="cadastroForm.controls['cpf'].touched && cadastroForm.controls['cpf'].invalid"
                         class="text-danger">Campo obrigatório</small>
                     <small *ngIf="cpfInvalido" class="text-danger">CPF inválido</small>
-                </div>              
+                </div>
                 <div class="form-group">
                     <label>
                         Login
@@ -64,7 +62,7 @@
                         Formulário</button>
                 </div>
                 <div id="modal">
-                    <button type="button" id="botaoModal" data-bs-toggle="modal" data-bs-target="#modalConfirmacao">                        
+                    <button type="button" id="botaoModal" data-bs-toggle="modal" data-bs-target="#modalConfirmacao">
                     </button>
                 </div>
             </form>

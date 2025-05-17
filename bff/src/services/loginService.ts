@@ -153,3 +153,41 @@ export const buscarPorId = async (id: string, token: string) => {
         throw new CustomError(error.message, error.status);
     }
 }
+
+export const buscarPorPagina = async (page: string, limit: string, token: string) =>{
+      try {
+        const options = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        }
+
+        log.info("Executando a /api/login/listar-todos-por-pagina");
+        const res = await fetch(`${environments.BACK_END}/login/listar-todos-por-pagina?limit=${limit}&page=${page}`, options);
+        const status = res.status;
+        let retorno;        
+        if (status === 204) {            
+            retorno = {
+                status: 204,
+                message: `Não há ítens cadastrados`
+            };
+        } else if(status === 200) {
+            const response = await res.json();            
+            retorno = {
+                status: 200,
+                response
+            };
+        } else {            
+            retorno = {
+                status,
+                message: `Erro interno do servidor`
+            };
+        }
+        return retorno;
+    } catch (error: any) {
+        log.error(`Erro: ${error}`);
+        throw new CustomError(error.message, error.status);
+    }
+}

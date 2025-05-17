@@ -3,7 +3,7 @@ import { MainComponent } from './main.component';
 import { LoginService } from '@services/login.service';
 import { provideRouter, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from './home/home.component';
+import { HomeComponent } from '../home/home.component';
 import { CadastroUsuarioComponent } from '@pages/usuarios/cadastro-usuario/cadastro-usuario.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpClient } from '@angular/common/http';

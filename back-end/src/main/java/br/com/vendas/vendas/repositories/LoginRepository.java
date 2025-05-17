@@ -1,7 +1,8 @@
 package br.com.vendas.vendas.repositories;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class LoginRepository {
 
 	final RowMapper<LoginCadastroResponse> loginCadastroMapper = (rs, rowNum) -> LoginCadastroResponse.builder()
 			.id(rs.getInt("id")).nome(rs.getString("nome")).cpf(rs.getString("cpf")).login(rs.getString("login"))
-			.senha(rs.getString("senha")).perfil(rs.getString("perfil")).build();
+			.senha(rs.getString("senha")).perfil(rs.getString("perfil")).active(rs.getBoolean("active")).build();
 
 	public LoginDTO buscarPorLoginESenha(String login, String senha) {
 
@@ -91,22 +92,28 @@ public class LoginRepository {
 		} catch (EmptyResultDataAccessException e) {
 			logger.error(e.getMessage());
 			throw new EmptyResultDataAccessException("Erro ao localizar os dados na base", 1);
-		}catch (DataAccessException e) {
+		} catch (DataAccessException e) {
 			logger.error(e.getMessage());
 			throw new DefaultErrorException("Erro ao localizar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	public List<LoginCadastroResponse> listarPorPagina(Integer limit, Integer offset) {
-		String sql = "SELECT * FROM usuarios WHERE id != 1  LIMIT :limit OFFSET :offset";		
-	    MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", limit).addValue("offset", (offset - 1) * limit);
+	public Map<String, Object> listarPorPagina(Integer limit, Integer page) {
+		String sql = "SELECT * FROM usuarios ORDER BY id ASC LIMIT :limit OFFSET :page";		
+	    MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", limit).addValue("page", ((page - 1) * limit));
 	    
 	    try {
-	        return namedParameterJdbcTemplate.query(sql, params, loginCadastroMapper);
+	    	List<LoginCadastroResponse> lista = namedParameterJdbcTemplate.query(sql, params, loginCadastroMapper);
+	    	sql = "SELECT COUNT(id) FROM usuarios";
+	    	Integer total = namedParameterJdbcTemplate.queryForObject(sql, new MapSqlParameterSource(),Integer.class);
+	    	Map<String, Object> retorno = new HashMap<String, Object>();
+	    	retorno.put("lista", lista);
+	    	retorno.put("total", total);
+	        return retorno;
 	    } catch (EmptyResultDataAccessException e) {
 	        logger.error(e.getMessage());
 	        e.printStackTrace();
-	        return Collections.emptyList();
+	        throw new EmptyResultDataAccessException("Sem items retornados", 500);
 	    } catch (DataAccessException e) {
 	        logger.error(e.getMessage());
 	        e.printStackTrace();

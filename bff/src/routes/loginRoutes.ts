@@ -1,4 +1,4 @@
-import Router from "express";
+import Router, { NextFunction } from "express";
 import * as loginController from "@controllers/loginController";
 import * as middleware from "@middlewares/middleware";
 
@@ -257,5 +257,85 @@ loginRoutes.put("/atualizar-login", middleware.verificaTokenValido, loginControl
  *                   example: "Erro ao buscar o login"
  */
 loginRoutes.get("/buscar-por-id/:id", middleware.verificaTokenValido, loginController.buscarPorId);
+
+/**
+ * @swagger
+ * /buscar-por-pagina:
+ *   get:
+ *     summary: Buscar uma lista paginada de logins
+ *     tags:
+ *       - Login
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Número da página (inicia em 1)
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Quantidade de registros por página
+ *     responses:
+ *       200:
+ *         description: Lista de logins encontrada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   example: 50
+ *                 lista:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 10
+ *                       nome:
+ *                         type: string
+ *                         example: "José da Silva"
+ *                       cpf:
+ *                         type: string
+ *                         example: "222.333.444-05"
+ *                       login:
+ *                         type: string
+ *                         example: "jose123"
+ *                       senha:
+ *                         type: string
+ *                         example: "jose@123"
+ *                       perfil:
+ *                         type: string
+ *                         example: "admin"
+ *       204:
+ *         description: Não há itens cadastrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Não há itens cadastrados"
+ *       500:
+ *         description: Erro ao buscar os logins
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erro ao buscar os logins"
+ */
+loginRoutes.get("/buscar-por-pagina", middleware.verificaTokenValido, loginController.buscarPorPagina);
+
 
 export default loginRoutes;

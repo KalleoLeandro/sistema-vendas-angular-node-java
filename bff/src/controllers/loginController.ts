@@ -79,7 +79,7 @@ export const atualizarLogin = async (req: Request, res: Response) => {
     }
 }
 
-export const buscarPorId = async(req:Request, res:Response) =>{
+export const buscarPorId = async(req:Request, res:Response) => {
     try {
         const id: string = req.params.id;
         const token: string = req.headers.authorization as string;        
@@ -93,5 +93,22 @@ export const buscarPorId = async(req:Request, res:Response) =>{
     } catch (error:any) {
         log.error(`Erro: ${error}`);
         res.status(500).json({message: "Erro ao atualizar o login"});
+    }
+}
+
+export const buscarPorPagina = async (req: Request, res: Response) => {    
+    try {
+        const page: string = req.query.page as string;
+        const limit: string = req.query.limit as string;
+        const token: string = req.headers.authorization as string;
+        const listaLogins = await loginService.buscarPorPagina(page, limit, token);
+        if(listaLogins.status === 200){            
+            res.status(listaLogins.status).json(listaLogins.response);
+        } else {            
+            res.status(listaLogins.status).json(listaLogins.message);
+        }        
+    } catch (error:any) {
+        log.error(`Erro: ${error}`);
+        res.status(500).json({message: "Erro ao listar os logins"});
     }
 }

@@ -3,6 +3,7 @@ package br.com.vendas.vendas.repositories;
 import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -253,11 +254,18 @@ class LoginRepositoryTest {
 	        Mockito.any(MapSqlParameterSource.class),
 	        Mockito.any(RowMapper.class)
 	    )).thenReturn(mockList);
+	    
+	    Mockito.when(namedParameterJdbcTemplate.queryForObject(
+		        Mockito.anyString(),
+		        Mockito.any(MapSqlParameterSource.class),
+		        Mockito.eq(Integer.class)
+		    )).thenReturn(5);
 
-	    List<LoginCadastroResponse> result = loginRepository.listarPorPagina(10, 1);
+	    Map<String, Object> result = loginRepository.listarPorPagina(10, 1);
 
 	    Assertions.assertNotNull(result);
-	    Assertions.assertEquals(2, result.get(0).getId());	    
+	    List<LoginCadastroResponse> lista = (List<LoginCadastroResponse>) result.get("lista");
+	    Assertions.assertEquals(2, lista.get(0).getId());	    
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -269,10 +277,10 @@ class LoginRepositoryTest {
 	        Mockito.any(RowMapper.class)
 	    )).thenReturn(Collections.emptyList());
 
-	    List<LoginCadastroResponse> result = loginRepository.listarPorPagina(10, 1);
+	    Map<String, Object> result = loginRepository.listarPorPagina(10, 1);
 
 	    Assertions.assertNotNull(result);
-	    Assertions.assertTrue(result.isEmpty(), "A lista deve estar vazia");
+	    Assertions.assertTrue(((List<?>) result.get("lista")).isEmpty(), "A lista deve estar vazia");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -300,9 +308,11 @@ class LoginRepositoryTest {
 	        Mockito.any(RowMapper.class)
 	    )).thenThrow(new EmptyResultDataAccessException("Erro simulado", 1));
 
-	    List<LoginCadastroResponse> lista = loginRepository.listarPorPagina(10,1);
+	    EmptyResultDataAccessException exception = Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+	        loginRepository.listarPorPagina(10, 1);
+	    });
 
-	    Assertions.assertEquals(0, lista.size());
+	    Assertions.assertEquals("Sem items retornados", exception.getMessage());
 	}
 
 

@@ -2,8 +2,9 @@ package br.com.vendas.vendas.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,56 +30,56 @@ public class LoginControllerTest {
 
 	@InjectMocks
 	LoginController controller;
-	
+
 	@Mock
 	LoginServiceImpl service;
-	
+
 	private LoginRequest loginRequest;
-	
-	private LoginResponse loginResponse;	
-	
-	private  CadastroLoginRequest cadastroLoginRequest; 
-	
+
+	private LoginResponse loginResponse;
+
+	private CadastroLoginRequest cadastroLoginRequest;
+
 	private AtualizacaoLoginRequest atualizacaoLoginRequest;
-	
+
 	private LoginCadastroResponse loginCadastroResponse;
-	
+
 	@BeforeEach
-    public void setup() {
+	public void setup() {
 		loginRequest = new LoginRequest();
-        loginRequest.setLogin("user");
-        loginRequest.setSenha("password");
-        
-        loginResponse = new LoginResponse();
-        loginResponse.setStatus(HttpStatus.OK);
-        loginResponse.setToken("token");
-        loginResponse.setExpiration("01/01/2024 12:00:00");
-        loginResponse.setUserName("user");  
-        
-        cadastroLoginRequest = new CadastroLoginRequest();
-        cadastroLoginRequest.setNome("teste");
-        cadastroLoginRequest.setCpf("22233344405");
-        cadastroLoginRequest.setLogin("user");
-        cadastroLoginRequest.setSenha("password");
-        cadastroLoginRequest.setPerfil("dev");
-        
-        atualizacaoLoginRequest = new AtualizacaoLoginRequest();
-        atualizacaoLoginRequest.setId(1);
-        atualizacaoLoginRequest.setNome("teste");
-        atualizacaoLoginRequest.setCpf("22233344405");
-        atualizacaoLoginRequest.setLogin("user");
-        atualizacaoLoginRequest.setSenha("password");
-        atualizacaoLoginRequest.setPerfil("dev");
-        
-        loginCadastroResponse = new LoginCadastroResponse();
-        loginCadastroResponse.setId(1);
-        loginCadastroResponse.setNome("teste");
-        loginCadastroResponse.setCpf("22233344405");
-        loginCadastroResponse.setLogin("user");
-        loginCadastroResponse.setSenha("password");
-        loginCadastroResponse.setPerfil("dev");
-    }
-	
+		loginRequest.setLogin("user");
+		loginRequest.setSenha("password");
+
+		loginResponse = new LoginResponse();
+		loginResponse.setStatus(HttpStatus.OK);
+		loginResponse.setToken("token");
+		loginResponse.setExpiration("01/01/2024 12:00:00");
+		loginResponse.setUserName("user");
+
+		cadastroLoginRequest = new CadastroLoginRequest();
+		cadastroLoginRequest.setNome("teste");
+		cadastroLoginRequest.setCpf("22233344405");
+		cadastroLoginRequest.setLogin("user");
+		cadastroLoginRequest.setSenha("password");
+		cadastroLoginRequest.setPerfil("dev");
+
+		atualizacaoLoginRequest = new AtualizacaoLoginRequest();
+		atualizacaoLoginRequest.setId(1);
+		atualizacaoLoginRequest.setNome("teste");
+		atualizacaoLoginRequest.setCpf("22233344405");
+		atualizacaoLoginRequest.setLogin("user");
+		atualizacaoLoginRequest.setSenha("password");
+		atualizacaoLoginRequest.setPerfil("dev");
+
+		loginCadastroResponse = new LoginCadastroResponse();
+		loginCadastroResponse.setId(1);
+		loginCadastroResponse.setNome("teste");
+		loginCadastroResponse.setCpf("22233344405");
+		loginCadastroResponse.setLogin("user");
+		loginCadastroResponse.setSenha("password");
+		loginCadastroResponse.setPerfil("dev");
+	}
+
 	@Test
 	public void testLoginOk() {
 		Mockito.when(service.validarLogin(any())).thenReturn(loginResponse);
@@ -86,7 +87,7 @@ public class LoginControllerTest {
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertNotNull(response);
 	}
-	
+
 	@Test
 	public void testTokenOk() {
 		Mockito.when(service.validarToken(any())).thenReturn(true);
@@ -94,21 +95,21 @@ public class LoginControllerTest {
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertTrue(response.getBody());
 	}
-	
+
 	@Test
 	public void testCadastrarLoginOk() {
 		Mockito.doNothing().when(service).cadastrarLogin(any());
 		ResponseEntity<Void> response = controller.cadastrarLogin(cadastroLoginRequest);
-		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());		
+		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
 	}
-	
+
 	@Test
 	public void testAtualizarLoginOk() {
 		Mockito.doNothing().when(service).atualizarLogin(any());
 		ResponseEntity<Void> response = controller.atualizarLogin(atualizacaoLoginRequest);
-		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());		
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
-	
+
 	@Test
 	public void testBuscarPorIdOk() {
 		Mockito.when(service.buscarPorId(any())).thenReturn(loginCadastroResponse);
@@ -116,13 +117,19 @@ public class LoginControllerTest {
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertNotNull(response.getBody());
 	}
-	
+
 	@Test
 	public void testListaPorPaginaOk() {
-		List<LoginCadastroResponse> lista = new ArrayList<LoginCadastroResponse>();
-		lista.add(loginCadastroResponse);
-		Mockito.when(service.listarPorPagina(any(), any())).thenReturn(lista);
-		ResponseEntity<List<LoginCadastroResponse>> response = controller.listarPorPagina(10,1);
+		LoginCadastroResponse loginMock = LoginCadastroResponse.builder().id(2).nome("Nome Teste").cpf("12345678901")
+				.login("teste").senha("teste123").perfil("user").build();
+
+		List<LoginCadastroResponse> listaMockada = List.of(loginMock);
+		Map<String, Object> mock = new HashMap<String, Object>();
+		mock.put("lista", listaMockada);
+		mock.put("total", 5);
+
+		Mockito.when(service.listarPorPagina(any(), any())).thenReturn(mock);
+		ResponseEntity<Map<String, Object>> response = controller.listarPorPagina(10, 1);
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertNotNull(response.getBody());
 	}

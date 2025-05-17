@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuardGuard } from '@guards/auth.guard.guard';
-import { CadastroUsuarioComponent } from '@pages/usuarios/cadastro-usuario/cadastro-usuario.component';
+
 
 export const routes: Routes = [
     {
@@ -15,7 +15,7 @@ export const routes: Routes = [
     {
         path: '', loadComponent: () => import("@pages/main/main.component").then(c => c.MainComponent), canActivate: [authGuardGuard], children: [
             { 
-                path: 'home', loadComponent: () => import("@pages/main/home/home.component").then(c => c.HomeComponent),
+                path: 'home', loadComponent: () => import("@pages/home/home.component").then(c => c.HomeComponent),
             },
             {
                 path: 'usuarios', children: [

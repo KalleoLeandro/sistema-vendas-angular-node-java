@@ -181,47 +181,47 @@ describe('loginService', () => {
       perfil: 'admin'
     };
     const token = 'valid-token';
-  
+
     it('retorna mensagem de sucesso com status 204', async () => {
       mockedFetch.mockResolvedValue({
         status: 204,
         json: () => Promise.resolve()
       });
-  
+
       const result = await loginService.atualizarLogin(cadastroLogin, token);
-  
+
       expect(result).toEqual({
         status: 204,
         message: 'Cadastro atualizado com sucesso'
       });
     });
-  
+
     it('retorna mensagem de erro com status diferente de 204', async () => {
       mockedFetch.mockResolvedValue({
         status: 400,
         json: () => Promise.resolve()
       });
-  
+
       const result = await loginService.atualizarLogin(cadastroLogin, token);
-  
+
       expect(result).toEqual({
         status: 400,
         message: 'Erro ao atualizar o login'
       });
     });
-  
+
     it('lança CustomError em caso de falha na rede', async () => {
       mockedFetch.mockRejectedValue(new Error('Falha na rede'));
-  
+
       await expect(loginService.atualizarLogin(cadastroLogin, token)).rejects.toThrow(CustomError);
       await expect(loginService.atualizarLogin(cadastroLogin, token)).rejects.toThrow('Falha na rede');
     });
-  });  
+  });
 
   describe('buscarLoginPorId', () => {
     const id = '123';
     const token = 'valid-token';
-  
+
     it('retorna objeto de cadastro ao buscar login valido', async () => {
       mockedFetch.mockResolvedValue({
         status: 200,
@@ -234,9 +234,9 @@ describe('loginService', () => {
           perfil: 'admin'
         })
       });
-  
+
       const result = await loginService.buscarPorId(id, token);
-  
+
       expect(result).toEqual({
         status: 200,
         response: {
@@ -249,15 +249,15 @@ describe('loginService', () => {
         }
       });
     });
-  
+
     it('retorna mensagem de erro com status 204', async () => {
       mockedFetch.mockResolvedValue({
         status: 204,
         json: () => Promise.resolve()
       });
-  
+
       const result = await loginService.buscarPorId(id, token);
-  
+
       expect(result).toEqual({
         status: 204,
         message: 'Usuário não encontrado'
@@ -269,19 +269,57 @@ describe('loginService', () => {
         status: 500,
         json: () => Promise.resolve()
       });
-  
+
       const result = await loginService.buscarPorId(id, token);
-  
+
       expect(result).toEqual({
         status: 500,
         message: `Erro interno do servidor`
       });
     });
-  
+
     it('lança CustomError em caso de falha na rede', async () => {
       mockedFetch.mockRejectedValue(new Error('Falha na rede'));
-  
-      await expect(loginService.buscarPorId(id, token)).rejects.toThrow(CustomError);      
+
+      await expect(loginService.buscarPorId(id, token)).rejects.toThrow(CustomError);
     });
-  });  
+  });
+
+  describe('buscarLoginPorPagina', () => {
+    it('retorna uma lista de items caso status === 200', async () => {
+      const page = '1';
+      const limit = '5';
+      const token = 'valid-token';
+
+      mockedFetch.mockResolvedValue({
+        status: 200,
+        json: () => Promise.resolve({
+          lista: [{
+            id: 123,
+            nome: 'Teste',
+            cpf: '222.333.444-05',
+            login: 'teste',
+            senha: 'teste123',
+            perfil: 'admin'
+          }],
+          total: 5
+        })
+      });
+      const result = await loginService.buscarPorPagina(page, limit, token);
+
+      expect(result).toEqual({
+        status: 200,
+        response: {
+          lista: [{
+          id: 123,
+          nome: 'Teste',
+          cpf: '222.333.444-05',
+          login: 'teste',
+          senha: 'teste123',
+          perfil: 'admin'
+        }]},
+        total: 5        
+      });
+    });
+  });
 });

@@ -30,6 +30,10 @@ export const swaggerDefinition = {
       name: 'Login',
       description: 'Operações relacionadas a login e token',
     },
+    {
+      name: 'Utils',
+      description: 'Operações relacionadas a validações e operações utilitárias',
+    },
   ],
   servers: [
     {

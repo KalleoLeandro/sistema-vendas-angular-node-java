@@ -7,5 +7,6 @@ create table usuarios(
     cpf unique varchar(20) not null,
     login varchar(64) not null,
     senha varchar(16) not null,
-    perfil int not null
+    perfil int not null,
+    active boolean not null default true
 );

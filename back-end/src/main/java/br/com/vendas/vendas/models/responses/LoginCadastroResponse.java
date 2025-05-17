@@ -21,4 +21,5 @@ public class LoginCadastroResponse {
 	private String login;	
 	private String senha;
 	private String perfil;
+	private Boolean active;
 }

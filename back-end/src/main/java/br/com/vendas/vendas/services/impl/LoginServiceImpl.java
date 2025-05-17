@@ -1,6 +1,6 @@
 package br.com.vendas.vendas.services.impl;
 
-import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,12 +118,12 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	@Override
-	public List<LoginCadastroResponse> listarPorPagina(Integer limit, Integer offset) {
+	public Map<String, Object> listarPorPagina(Integer limit, Integer page) {
 		try{			
 			logger.info("Executando o LoginRepository.listarPorPagina");
-			return loginRepository.listarPorPagina(limit, offset);			
+			return loginRepository.listarPorPagina(limit, page);			
 		}catch (EmptyResultDataAccessException e) {
-	        logger.warn("Sem itens retornado", limit, offset);
+	        logger.warn("Sem itens retornado", limit, page);
 	        throw new DefaultErrorException("Sem itens retornado", HttpStatus.NO_CONTENT);
 	    } catch (Exception e) {
 			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as loginService from '@services/loginService';
 import { CustomError } from '@errors/customError';
 import { decriptografia } from '@utils/utils';
-import { atualizarLogin, buscarPorId, cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
+import { atualizarLogin, buscarPorId, buscarPorPagina, cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
 import { LoginCadastroDados } from '@models/cadastroLogin';
 
 // Mocks
@@ -340,7 +340,111 @@ describe('loginController', () => {
       await buscarPorId(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({message: "Erro ao atualizar o login"});
+      expect(res.json).toHaveBeenCalledWith({ message: "Erro ao atualizar o login" });
+    })
+  });
+
+  describe('buscarLoginPorPagina', () => {
+    it('Deve retornar uma lista de logins ', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+        query: {
+          page: 1,
+          limit: 5
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.buscarPorPagina as jest.Mock).mockResolvedValue({
+        status: 200, response: {
+          lista: [
+            {
+              id: 2,
+              nome: 'teste',
+              cpf: '222.333.444-05',
+              login: 'teste',
+              senha: 'teste123',
+              perfil: 'admin'
+            }
+          ],
+          total: 5
+        }
+      });
+
+      await buscarPorPagina(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        lista: [{
+          id: 2,
+          nome: 'teste',
+          cpf: '222.333.444-05',
+          login: 'teste',
+          senha: 'teste123',
+          perfil: 'admin'
+        }],
+        total: 5
+      });
+    })
+  
+
+   it('Deve retornar uma mensagem caso não existam items no banco de dados', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+        query: {
+          page: 1,
+          limit: 5
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.buscarPorPagina as jest.Mock).mockResolvedValue({
+        status: 204, message: `Não há ítens cadastrados`
+      });
+
+      await buscarPorPagina(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.json).toHaveBeenCalledWith(`Não há ítens cadastrados`);
+    })
+
+     it('Deve retornar uma mensagem de erro caso retorne erros na execução', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+        query: {
+          page: 1,
+          limit: 5
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.buscarPorPagina as jest.Mock).mockRejectedValue(new CustomError('Erro inesperado', 500));
+
+      await buscarPorPagina(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: "Erro ao listar os logins" });
     })
   });
 });

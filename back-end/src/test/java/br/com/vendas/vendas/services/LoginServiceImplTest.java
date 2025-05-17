@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -318,8 +320,7 @@ class LoginServiceImplTest {
 	}
 	
 	@Test
-	void testListarPorPagina_Sucesso() {
-	    // Cria um mock de resposta
+	void testListarPorPagina_Sucesso() {	    
 	    LoginCadastroResponse loginMock = LoginCadastroResponse.builder()
 	        .id(2)
 	        .nome("Nome Teste")
@@ -330,16 +331,21 @@ class LoginServiceImplTest {
 	        .build();
 
 	    List<LoginCadastroResponse> listaMockada = List.of(loginMock);
+	    Map<String, Object> mock = new HashMap<String, Object>();
+	    mock.put("lista", listaMockada);
+	    mock.put("total", 5);
 
-	    Mockito.when(loginRepository.listarPorPagina(10, 0)).thenReturn(listaMockada);
+	    Mockito.when(loginRepository.listarPorPagina(10, 0)).thenReturn(mock);
 
-	    List<LoginCadastroResponse> resultado = loginService.listarPorPagina(10, 0);
+	    Map<String, Object> result = loginService.listarPorPagina(10, 0);
 	    
-	    Assertions.assertNotNull(resultado);
-	    Assertions.assertEquals(1, resultado.size());
-	    Assertions.assertEquals("Nome Teste", resultado.get(0).getNome());
-	    Assertions.assertEquals("teste", resultado.get(0).getLogin());
-	    Assertions.assertEquals("user", resultado.get(0).getPerfil());
+	    Assertions.assertNotNull(result);
+	    @SuppressWarnings("unchecked")
+		List<LoginCadastroResponse> lista = (List<LoginCadastroResponse>) result.get("lista");
+	    Assertions.assertEquals(1, lista.size());
+	    Assertions.assertEquals("Nome Teste", lista.get(0).getNome());
+	    Assertions.assertEquals("teste", lista.get(0).getLogin());
+	    Assertions.assertEquals("user", lista.get(0).getPerfil());
 	}
 
 	
@@ -368,6 +374,4 @@ class LoginServiceImplTest {
 	    Assertions.assertEquals("Erro inesperado", ex.getMessage());
 	    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
 	}
-
-
 }

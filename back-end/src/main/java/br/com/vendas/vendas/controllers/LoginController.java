@@ -1,6 +1,6 @@
 package br.com.vendas.vendas.controllers;
 
-import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,7 @@ public class LoginController {
 
 	@Operation(summary = "Faz o cadastro de um login", description = "Valida dados e cadastra o login", security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Cadastro bem-sucedido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CadastroLoginRequest.class))),
+			@ApiResponse(responseCode = "200", description = "Cadastro bem-sucedido", content = @Content(mediaType = "application/json")),
 			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
 			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
 	@PostMapping("/cadastrar-login")
@@ -107,14 +107,39 @@ public class LoginController {
 	
 	@Operation(summary = "Buscar uma página de logins com base na pagina fornecida", description = "Buscar um login com base em um id fornecido", security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Login localizado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CadastroLoginRequest.class))),
+			@ApiResponse(
+				    responseCode = "200",
+				    description = "Login localizado",
+				    content = @Content(
+				        mediaType = "application/json",
+				        schema = @Schema(
+				            type = "object",
+				            example = """
+				            {
+				                "total": 50,
+				                "lista": [
+				                    {
+				                        "id": 10,
+				                        "nome": "José da Silva",
+				                        "cpf": "222.333.444-05",
+				                        "login": "jose123",
+				                        "senha": "jose@123",
+				                        "perfil": "admin"
+				                    }
+				                ]
+				            }
+				            """
+				        )
+				    )
+				),
 			@ApiResponse(responseCode = "204", description = "Sem itens retornado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class), examples = @ExampleObject(summary = "Exemplo de usuário não localizado", value = "{\"timestamp\": \"2025-04-19T15:30:00\", \"message\": \"Sem itens retornado\", \"status\": 204}"))),
 			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
-			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
+			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class)))}
+	)
 	@GetMapping("/listar-todos-por-pagina")
-	public ResponseEntity<List<LoginCadastroResponse>> listarPorPagina(@RequestParam Integer limit, @RequestParam Integer offset) {
+	public ResponseEntity<Map<String, Object>> listarPorPagina(@RequestParam Integer limit, @RequestParam Integer page) {
 		logger.info("Executando a LoginService.listarPorPagina");
-		return ResponseEntity.status(HttpStatus.OK).body(loginService.listarPorPagina(limit, offset));
+		return ResponseEntity.status(HttpStatus.OK).body(loginService.listarPorPagina(limit, page));
 	}
 
 }
