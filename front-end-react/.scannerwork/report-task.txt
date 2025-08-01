@@ -1,6 +1,0 @@
-projectKey=front-end-react
-serverUrl=http://localhost:9001
-serverVersion=25.7.0.110598
-dashboardUrl=http://localhost:9001/dashboard?id=front-end-react
-ceTaskId=ba87bf9c-85ce-4e36-bdfb-c0282d78257a
-ceTaskUrl=http://localhost:9001/api/ce/task?id=ba87bf9c-85ce-4e36-bdfb-c0282d78257a
