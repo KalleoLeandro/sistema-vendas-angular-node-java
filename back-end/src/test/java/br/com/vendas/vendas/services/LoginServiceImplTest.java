@@ -59,8 +59,7 @@ class LoginServiceImplTest {
 		loginCadastroResponse.setId(1);
 		loginCadastroResponse.setNome("teste");
 		loginCadastroResponse.setCpf("22233344405");
-		loginCadastroResponse.setLogin("user");
-		loginCadastroResponse.setSenha("password");
+		loginCadastroResponse.setLogin("user");		
 		loginCadastroResponse.setPerfil("dev");
 	}
 
@@ -325,8 +324,7 @@ class LoginServiceImplTest {
 	        .id(2)
 	        .nome("Nome Teste")
 	        .cpf("12345678901")
-	        .login("teste")
-	        .senha("teste123")
+	        .login("teste")	        
 	        .perfil("user")
 	        .build();
 

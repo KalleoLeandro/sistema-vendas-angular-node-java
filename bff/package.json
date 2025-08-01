@@ -1,10 +1,11 @@
 {
   "name": "bff",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
-    "test": "npx jest --clearCache && npx jest --coverage"
+    "test": "npx jest --clearCache && npx jest --coverage",
+    "sonar": "sonar-scanner"
   },
   "keywords": [],
   "author": "",

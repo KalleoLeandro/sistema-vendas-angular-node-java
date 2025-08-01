@@ -75,8 +75,7 @@ public class LoginControllerTest {
 		loginCadastroResponse.setId(1);
 		loginCadastroResponse.setNome("teste");
 		loginCadastroResponse.setCpf("22233344405");
-		loginCadastroResponse.setLogin("user");
-		loginCadastroResponse.setSenha("password");
+		loginCadastroResponse.setLogin("user");		
 		loginCadastroResponse.setPerfil("dev");
 	}
 
@@ -121,7 +120,7 @@ public class LoginControllerTest {
 	@Test
 	public void testListaPorPaginaOk() {
 		LoginCadastroResponse loginMock = LoginCadastroResponse.builder().id(2).nome("Nome Teste").cpf("12345678901")
-				.login("teste").senha("teste123").perfil("user").build();
+				.login("teste").perfil("user").build();
 
 		List<LoginCadastroResponse> listaMockada = List.of(loginMock);
 		Map<String, Object> mock = new HashMap<String, Object>();

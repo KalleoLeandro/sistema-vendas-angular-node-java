@@ -1,0 +1,54 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #ffffff;
+}
+
+.loginCard {
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loginTitle {
+  margin-bottom: 1.5rem;
+  font-size: 24px;
+  text-align: center;
+  color: #006437;
+}
+
+.formControl {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+}
+
+.formLabel {
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: .5rem;;
+}
+
+.loginBtn {
+  background-color: #006437;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.loginBtn:hover {
+  background-color: #004b2e;
+}
+
+.errorMessage {
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+  color: red;
+}

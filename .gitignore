@@ -51,13 +51,13 @@ hs_err_pid*
 # =====================================
 # ANGULAR FRONT-END (pasta: /front-end)
 # =====================================
-/front-end/node_modules/
-/front-end/dist/
-/front-end/.angular/
-/front-end/.angular/cache/
-/front-end/.angular/config.json
-/front-end/coverage/
-/front-end/.scannerwork/
+/front-end-angular/node_modules/
+/front-end-angular/dist/
+/front-end-angular/.angular/
+/front-end-angular/.angular/cache/
+/front-end-angular/.angular/config.json
+/front-end-angular/coverage/
+/front-end-angular/.scannerwork/
 
 # Angular build artifacts
 *.js.map

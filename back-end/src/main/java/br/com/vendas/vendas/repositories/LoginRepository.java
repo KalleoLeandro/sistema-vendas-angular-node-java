@@ -34,7 +34,7 @@ public class LoginRepository {
 
 	final RowMapper<LoginCadastroResponse> loginCadastroMapper = (rs, rowNum) -> LoginCadastroResponse.builder()
 			.id(rs.getInt("id")).nome(rs.getString("nome")).cpf(rs.getString("cpf")).login(rs.getString("login"))
-			.senha(rs.getString("senha")).perfil(rs.getString("perfil")).active(rs.getBoolean("active")).build();
+			.perfil(rs.getString("perfil")).active(rs.getBoolean("active")).build();
 
 	public LoginDTO buscarPorLoginESenha(String login, String senha) {
 
@@ -99,12 +99,12 @@ public class LoginRepository {
 	}
 
 	public Map<String, Object> listarPorPagina(Integer limit, Integer page) {
-		String sql = "SELECT * FROM usuarios ORDER BY id ASC LIMIT :limit OFFSET :page";		
+		String sql = "SELECT * FROM usuarios where id != 1 ORDER BY id ASC LIMIT :limit OFFSET :page";		
 	    MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", limit).addValue("page", ((page - 1) * limit));
 	    
 	    try {
 	    	List<LoginCadastroResponse> lista = namedParameterJdbcTemplate.query(sql, params, loginCadastroMapper);
-	    	sql = "SELECT COUNT(id) FROM usuarios";
+	    	sql = "SELECT COUNT(id) FROM usuarios where id != 1";
 	    	Integer total = namedParameterJdbcTemplate.queryForObject(sql, new MapSqlParameterSource(),Integer.class);
 	    	Map<String, Object> retorno = new HashMap<String, Object>();
 	    	retorno.put("lista", lista);

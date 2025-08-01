@@ -186,8 +186,7 @@ class LoginRepositoryTest {
 			Mockito.when(rs.getInt("id")).thenReturn(2);
 			Mockito.when(rs.getString("nome")).thenReturn("Nome Teste");
 			Mockito.when(rs.getString("cpf")).thenReturn("12345678901");
-			Mockito.when(rs.getString("login")).thenReturn("teste");
-			Mockito.when(rs.getString("senha")).thenReturn("teste123");
+			Mockito.when(rs.getString("login")).thenReturn("teste");			
 			Mockito.when(rs.getString("perfil")).thenReturn("user");
 
 			return rowMapper.mapRow(rs, 1);
@@ -200,8 +199,7 @@ class LoginRepositoryTest {
 		Assertions.assertEquals(2, result.getId());
 		Assertions.assertEquals("Nome Teste", result.getNome());
 		Assertions.assertEquals("12345678901", result.getCpf());
-		Assertions.assertEquals("teste", result.getLogin());
-		Assertions.assertEquals("teste123", result.getSenha());
+		Assertions.assertEquals("teste", result.getLogin());		
 		Assertions.assertEquals("user", result.getPerfil());
 	}
 	
@@ -242,8 +240,7 @@ class LoginRepositoryTest {
 	        .id(2)
 	        .nome("Nome Teste")
 	        .cpf("12345678901")
-	        .login("teste")
-	        .senha("teste123")
+	        .login("teste")	        
 	        .perfil("user")
 	        .build();
 

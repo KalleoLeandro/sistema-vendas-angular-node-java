@@ -230,7 +230,6 @@ describe('loginService', () => {
           nome: 'Teste',
           cpf: '222.333.444-05',
           login: 'teste',
-          senha: 'teste123',
           perfil: 'admin'
         })
       });
@@ -244,7 +243,6 @@ describe('loginService', () => {
           nome: 'Teste',
           cpf: '222.333.444-05',
           login: 'teste',
-          senha: 'teste123',
           perfil: 'admin'
         }
       });
@@ -299,7 +297,6 @@ describe('loginService', () => {
             nome: 'Teste',
             cpf: '222.333.444-05',
             login: 'teste',
-            senha: 'teste123',
             perfil: 'admin'
           }],
           total: 5
@@ -311,14 +308,14 @@ describe('loginService', () => {
         status: 200,
         response: {
           lista: [{
-          id: 123,
-          nome: 'Teste',
-          cpf: '222.333.444-05',
-          login: 'teste',
-          senha: 'teste123',
-          perfil: 'admin'
-        }]},
-        total: 5        
+            id: 123,
+            nome: 'Teste',
+            cpf: '222.333.444-05',
+            login: 'teste',
+            perfil: 'admin'
+          }],
+          total: 5
+        },
       });
     });
   });

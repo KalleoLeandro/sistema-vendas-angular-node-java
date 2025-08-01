@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
         apiError.setTimestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         apiError.setStatus(HttpStatus.BAD_REQUEST.value());
         apiError.setError("Bad Request");
-        apiError.setMessage("Erros de validação: " + invalidFields); // Inclui os campos inválidos e suas mensagens        
+        apiError.setMessage("Erros de validação: " + invalidFields);     
 
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }

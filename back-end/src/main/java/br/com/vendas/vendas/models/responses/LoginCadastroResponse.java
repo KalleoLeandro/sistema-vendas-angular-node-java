@@ -18,8 +18,7 @@ public class LoginCadastroResponse {
 	private int id;
 	private String nome;	
 	private String cpf;
-	private String login;	
-	private String senha;
+	private String login;
 	private String perfil;
 	private Boolean active;
 }

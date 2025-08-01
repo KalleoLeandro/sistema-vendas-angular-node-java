@@ -274,8 +274,7 @@ describe('loginController', () => {
           id: 2,
           nome: 'teste',
           cpf: '222.333.444-05',
-          login: 'teste',
-          senha: 'teste123',
+          login: 'teste',          
           perfil: 'admin'
         }
       });
@@ -287,8 +286,7 @@ describe('loginController', () => {
         id: 2,
         nome: 'teste',
         cpf: '222.333.444-05',
-        login: 'teste',
-        senha: 'teste123',
+        login: 'teste',        
         perfil: 'admin'
       });
     })
@@ -369,8 +367,7 @@ describe('loginController', () => {
               id: 2,
               nome: 'teste',
               cpf: '222.333.444-05',
-              login: 'teste',
-              senha: 'teste123',
+              login: 'teste',              
               perfil: 'admin'
             }
           ],
@@ -386,8 +383,7 @@ describe('loginController', () => {
           id: 2,
           nome: 'teste',
           cpf: '222.333.444-05',
-          login: 'teste',
-          senha: 'teste123',
+          login: 'teste',          
           perfil: 'admin'
         }],
         total: 5

@@ -48,19 +48,28 @@ services:
       - PORT=3000
       - BACK_END=http://back-end:8080/api
 
-  front-end:
+  front-end-angular:
     build:
-      context: ./front-end
-    container_name: sistema_vendas_front-end
+      context: ./front-end-angular
+    container_name: sistema_vendas_front-end-angular
     networks:
       - minharede
     ports:
       - "4200:4200"
     depends_on:
       - bff
-    volumes:
-      - ${PWD}/front-end
-
+  
+  front-end-react:
+    build:
+      context: ./front-end-react
+    container_name: sistema_vendas_front-end-react
+    networks:
+      - minharede
+    ports:
+      - "4000:4000"
+    depends_on:
+      - bff
+      
   prometheus:
     container_name: sistema_vendas_prometheus
     image: prom/prometheus:latest
