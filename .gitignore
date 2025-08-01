@@ -59,6 +59,14 @@ hs_err_pid*
 /front-end-angular/coverage/
 /front-end-angular/.scannerwork/
 
+# =====================================
+# ANGULAR FRONT-END (pasta: /front-end)
+# =====================================
+/front-end-react/node_modules/
+/front-end-react/dist/
+/front-end-react/coverage/
+/front-end-react/.scannerwork/
+
 # Angular build artifacts
 *.js.map
 *.ngfactory.ts
