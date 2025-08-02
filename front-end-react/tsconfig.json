@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",    
-    "types": ["vitest", "vite/client"]
+    "types": ["vitest", "vitest/globals", "vite/client"]
   },
   "include": ["src"]
 }

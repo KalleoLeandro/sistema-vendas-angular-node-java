@@ -24,7 +24,7 @@ export default function CadastroUsuario() {
 
   const {
     register,
-    handleSubmit,    
+    handleSubmit,
     reset,
     formState: { errors },
   } = useForm<UsuarioForm>();
@@ -76,43 +76,43 @@ export default function CadastroUsuario() {
               <input type="text" className="form-control mb-3" disabled {...register('id')} />
             )}
             <div className="mb-3">
-              <label>Nome</label>
-              <input className="form-control" {...register('nome', { required: true })} />
-              {errors.nome && <small className="text-danger">Campo obrigatório</small>}
+              <label>Nome<input className="form-control" {...register('nome', { required: true })} />
+                {errors.nome && <small className="text-danger">Campo obrigatório</small>}
+              </label>
             </div>
 
             <div className="mb-3">
-              <label>CPF</label>
-              <input
-                className="form-control"
-                {...register('cpf', { required: true })}
-                onBlur={(e) => verificarCpf(e.target.value)}
-              />
+              <label>CPF<input
+                  className="form-control"
+                  {...register('cpf', { required: true })}
+                  onBlur={(e) => verificarCpf(e.target.value)}
+                />
+              </label>
               {errors.cpf && <small className="text-danger">Campo obrigatório</small>}
               {cpfInvalido && <small className="text-danger">CPF inválido</small>}
             </div>
 
             <div className="mb-3">
-              <label>Login</label>
-              <input className="form-control" {...register('login', { required: true })} />
-              {errors.login && <small className="text-danger">Campo obrigatório</small>}
+              <label>Login<input className="form-control" {...register('login', { required: true })} />
+                {errors.login && <small className="text-danger">Campo obrigatório</small>}
+              </label>
             </div>
 
             <div className="mb-3">
-              <label>Senha</label>
-              <input type="password" className="form-control" {...register('senha', { required: true })} />
-              {errors.senha && <small className="text-danger">Campo obrigatório</small>}
+              <label>Senha<input type="password" className="form-control" {...register('senha', { required: true })} />
+                {errors.senha && <small className="text-danger">Campo obrigatório</small>}
+              </label>
             </div>
 
             <div className="mb-3">
-              <label>Perfil</label>
-              <select className="form-control" {...register('perfil', { required: true })}>
-                <option value="">--Selecione o perfil--</option>
-                {perfis.map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-              {errors.perfil && <small className="text-danger">Campo obrigatório</small>}
+              <label>Perfil<select className="form-control" {...register('perfil', { required: true })}>
+                  <option value="">--Selecione o perfil--</option>
+                  {perfis.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                {errors.perfil && <small className="text-danger">Campo obrigatório</small>}
+              </label>
             </div>
 
             <div className="mt-4 d-flex gap-2">

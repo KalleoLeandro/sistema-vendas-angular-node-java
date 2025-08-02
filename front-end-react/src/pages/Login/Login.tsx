@@ -12,7 +12,7 @@ interface LoginResponse {
   token: string;  
 }
 
-const loginUser = async ({ login, senha }: LoginParams): Promise<LoginResponse> => {
+export const loginUser = async ({ login, senha }: LoginParams): Promise<LoginResponse> => {
 
   const hash = criptografia({login, senha});  
   const response = await fetch('http://localhost:3000/validar-login', {
