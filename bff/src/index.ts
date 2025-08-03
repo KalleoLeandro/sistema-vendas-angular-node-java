@@ -1,4 +1,4 @@
-import { environments } from "environments/environments";
+import { environments } from "@environments/environments";
 import express, { Request, Response } from "express";
 import { logger } from "utils/utils";
 import { Logger } from "winston";

@@ -1,15 +1,9 @@
-FROM node:latest
+FROM nginx:alpine
 
-RUN npm install -g @angular/cli
+COPY nginx.conf /etc/nginx/nginx.conf
 
-WORKDIR /app
+COPY dist/front-end-angular/browser/ /usr/share/nginx/html
 
-COPY . .
+EXPOSE 80
 
-RUN rm -rf node_modules package-lock.json
-
-RUN npm install
-
-EXPOSE 4200
-
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]

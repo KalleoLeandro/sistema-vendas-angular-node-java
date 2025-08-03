@@ -1,16 +1,11 @@
-FROM node:latest
+FROM nginx:alpine
 
-WORKDIR /app
+RUN rm /etc/nginx/conf.d/default.conf
 
-COPY package*.json ./
+COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY . .
+COPY dist/ /usr/share/nginx/html
 
-RUN rm -rf node_modules package-lock.json
+EXPOSE 80
 
-
-RUN npm install
-
-EXPOSE 4000
-
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "4000"]
+CMD ["nginx", "-g", "daemon off;"]

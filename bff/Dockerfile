@@ -2,10 +2,11 @@ FROM node:latest
 
 WORKDIR /bff
 
-COPY . .
+COPY package*.json ./
+RUN npm install --production
 
-RUN npm install
-
-CMD [ "npm", "run", "dev" ]
+COPY dist ./dist
 
 EXPOSE 3000
+
+CMD ["node", "dist/index.js"]

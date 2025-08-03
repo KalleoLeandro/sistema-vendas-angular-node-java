@@ -55,7 +55,7 @@ services:
     networks:
       - minharede
     ports:
-      - "4200:4200"
+      - "4200:80"
     depends_on:
       - bff
   
@@ -66,7 +66,7 @@ services:
     networks:
       - minharede
     ports:
-      - "4000:4000"
+      - "4000:80"
     depends_on:
       - bff
       
@@ -76,7 +76,7 @@ services:
     depends_on:
       - back-end
     ports:
-      - "9091:9090"
+      - "9090:9090"
     networks:
       - minharede
     volumes:
@@ -87,17 +87,22 @@ services:
     container_name: sistema_vendas_grafana
     image: grafana/grafana:latest
     ports:
-      - "3001:3000"
+     - "3001:3000"
+    environment:
+     - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
-      - minharede
+     - minharede
     volumes:
-      - grafana_data:/var/lib/grafana
+     - grafana_data:/var/lib/grafana
+     - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+     - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+     - ./grafana/dashboards:/var/lib/grafana/dashboards   
 
   sonarqube:
     image: sonarqube:latest
     container_name: sonar
     ports:
-      - "9001:9000"
+      - "9000:9000"
     environment:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
     volumes:

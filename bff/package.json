@@ -4,8 +4,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
+    "start": "node dist/index.js",
     "test": "npx jest --clearCache && npx jest --coverage",
-    "sonar": "sonar-scanner"
+    "sonar": "sonar-scanner",
+    "build": "npx tsc && tsc-alias"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +41,7 @@
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }
