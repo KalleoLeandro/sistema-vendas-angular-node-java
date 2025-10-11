@@ -45,7 +45,7 @@ public class LoginControllerTest {
 	private LoginCadastroResponse loginCadastroResponse;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		loginRequest = new LoginRequest();
 		loginRequest.setLogin("user");
 		loginRequest.setSenha("password");
@@ -80,7 +80,7 @@ public class LoginControllerTest {
 	}
 
 	@Test
-	public void testLoginOk() {
+	void testLoginOk() {
 		Mockito.when(service.validarLogin(any())).thenReturn(loginResponse);
 		ResponseEntity<LoginResponse> response = controller.validarLogin(loginRequest);
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -88,7 +88,7 @@ public class LoginControllerTest {
 	}
 
 	@Test
-	public void testTokenOk() {
+	void testTokenOk() {
 		Mockito.when(service.validarToken(any())).thenReturn(true);
 		ResponseEntity<Boolean> response = controller.validarToken("token");
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -96,21 +96,21 @@ public class LoginControllerTest {
 	}
 
 	@Test
-	public void testCadastrarLoginOk() {
+	void testCadastrarLoginOk() {
 		Mockito.doNothing().when(service).cadastrarLogin(any());
 		ResponseEntity<Void> response = controller.cadastrarLogin(cadastroLoginRequest);
 		Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
 	}
 
 	@Test
-	public void testAtualizarLoginOk() {
+	void testAtualizarLoginOk() {
 		Mockito.doNothing().when(service).atualizarLogin(any());
 		ResponseEntity<Void> response = controller.atualizarLogin(atualizacaoLoginRequest);
 		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 	}
 
 	@Test
-	public void testBuscarPorIdOk() {
+	void testBuscarPorIdOk() {
 		Mockito.when(service.buscarPorId(any())).thenReturn(loginCadastroResponse);
 		ResponseEntity<LoginCadastroResponse> response = controller.buscarPorId(1);
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -118,7 +118,7 @@ public class LoginControllerTest {
 	}
 
 	@Test
-	public void testListaPorPaginaOk() {
+	void testListaPorPaginaOk() {
 		LoginCadastroResponse loginMock = LoginCadastroResponse.builder().id(2).nome("Nome Teste").cpf("12345678901")
 				.login("teste").perfil("user").build();
 
@@ -134,7 +134,7 @@ public class LoginControllerTest {
 	}
 	
 	@Test
-	public void excluirLoginOk() {
+	void excluirLoginOk() {
 		Mockito.doNothing().when(service).excluirLogin(any());
 		ResponseEntity<Void> response = controller.excluirLogin(2);
 		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());		

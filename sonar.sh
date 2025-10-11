@@ -24,7 +24,9 @@ for projeto in "${projetos[@]}"; do
      -Dsonar.projectKey=back_end \
      -Dsonar.projectName='Back end' \
      -Dsonar.host.url=http://localhost:9000 \
-     -Dsonar.token=sqp_1f19062eac0a877223a3b708a3d81d681c818171
+     -Dsonar.token=sqp_1f19062eac0a877223a3b708a3d81d681c818171 \
+     -Dsonar.coverage.exclusions=**/VendasApplication.java
+
 
     cd - > /dev/null
 

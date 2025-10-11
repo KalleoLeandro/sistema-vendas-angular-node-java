@@ -311,6 +311,32 @@ class LoginRepositoryTest {
 
 	    Assertions.assertEquals("Sem items retornados", exception.getMessage());
 	}
+	
+	@Test
+	void testExcluirLogin_Success() throws Exception {
+		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
+		.thenReturn(1);
+		loginRepository.excluirLogin(1);
+
+		Mockito.verify(namedParameterJdbcTemplate).update(Mockito.anyString(),
+				Mockito.any(MapSqlParameterSource.class));
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	void testExcluirLogin_Exception() {
+
+		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
+				.thenThrow(new DataAccessException("...") {
+				});
+
+		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+			loginRepository.excluirLogin(1);
+		});
+
+		Assertions.assertEquals("Erro ao excluir o dado na base", ex.getMessage());
+		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
+	}
 
 
 
