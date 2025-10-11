@@ -120,5 +120,16 @@ public class LoginRepository {
 	        throw new DefaultErrorException("Erro ao localizar os dados na base", HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
+	
+	public void excluirLogin(Integer id) {
+		String sql = "DELETE FROM usuarios WHERE id = :id";
+		MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
+		try {
+			namedParameterJdbcTemplate.update(sql, params);
+		} catch (DataAccessException e) {
+			logger.error(e.getMessage());
+			throw new DefaultErrorException("Erro ao excluir o dado na base", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

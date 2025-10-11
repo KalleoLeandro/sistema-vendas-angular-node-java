@@ -55,7 +55,7 @@ export default function CadastroUsuario() {
   }, [usuario]);
 
   const verificarCpf = async (cpf: string) => {
-    const validado = await validarCpf(cpf);
+    const validado:any = await validarCpf(cpf);
     setCpfInvalido(!validado.valido);
   };
 

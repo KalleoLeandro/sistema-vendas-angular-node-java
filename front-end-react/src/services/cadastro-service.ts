@@ -5,7 +5,7 @@ export type Usuario = {
 };
 
 export const cadastrarUsuario = (usuario: any) =>
-  fetch('http://localhost:3000/api/usuarios', {
+  fetch('http://localhost:3000/usuarios', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('token')}` },
     body: JSON.stringify(usuario),
@@ -15,7 +15,7 @@ export const cadastrarUsuario = (usuario: any) =>
   });
 
 export const atualizarUsuario = (id: string, usuario: any) =>
-  fetch(`http://localhost:3000/api/usuarios/${id}`, {
+  fetch(`http://localhost:3000/usuarios/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionStorage.getItem('token')}` },
     body: JSON.stringify(usuario),
@@ -25,11 +25,19 @@ export const atualizarUsuario = (id: string, usuario: any) =>
   });
 
 export const buscarUsuarioPorId = (id: string) =>
-  fetch(`http://localhost:3000/api/usuarios/${id}`, {
+  fetch(`http://localhost:3000/usuarios/${id}`, {
     headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
   }).then((res) => res.json());
 
-export const validarCpf = (cpf: string) =>
-  fetch(`http://localhost:3000/api/cpf/validar?cpf=${cpf}`, {
-    headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
+export const validarCpf = (cpf: string) => {
+  const cpfFormat = cpf.replaceAll(".", "").replaceAll("-", "");
+  return fetch(`http://localhost:3000/validar-cpf`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ cpf: cpfFormat })
   }).then((res) => res.json());
+};
+

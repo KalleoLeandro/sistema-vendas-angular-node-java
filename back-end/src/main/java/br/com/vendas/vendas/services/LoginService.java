@@ -21,5 +21,7 @@ public interface LoginService {
 	public LoginCadastroResponse buscarPorId(Integer id);
 
 	public Map<String, Object> listarPorPagina(Integer limit, Integer page);
+	
+	public void excluirLogin(Integer id);
 
 }

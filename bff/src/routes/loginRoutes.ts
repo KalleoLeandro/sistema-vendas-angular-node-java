@@ -337,5 +337,39 @@ loginRoutes.get("/buscar-por-id/:id", middleware.verificaTokenValido, loginContr
  */
 loginRoutes.get("/buscar-por-pagina", middleware.verificaTokenValido, loginController.buscarPorPagina);
 
+/**
+ * @swagger
+ * /atualizar-login:
+ *   put:
+ *     summary: Atualização de Login
+ *     tags:
+ *       - Login
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do login a ser excluido 
+ *     responses:
+ *       204:
+ *         description: Login excluido com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               example: {}
+ *       500:
+ *         description: Erro ao excluir o login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erro ao excluir o login"
+ */
+loginRoutes.delete("/excluir-login/:id", middleware.verificaTokenValido, loginController.excluirLogin);
 
 export default loginRoutes;

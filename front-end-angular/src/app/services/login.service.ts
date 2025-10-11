@@ -111,4 +111,19 @@ export class LoginService {
       )
     );
   }
+
+  public excluirUsuario(id: number, token: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'authorization': `${token}`,
+      })
+    }
+
+    return this.httpClient.delete<any>(`${this.url()}/excluir-login/${id}`, httpOptions).pipe(
+      catchError((error: HttpErrorResponse) =>
+        throwError(() => error)
+      )
+    );
+  }
 }

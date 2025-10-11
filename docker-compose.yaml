@@ -100,7 +100,7 @@ services:
 
   sonarqube:
     image: sonarqube:latest
-    container_name: sonar
+    container_name: sistema_vendas_sonar
     ports:
       - "9000:9000"
     environment:

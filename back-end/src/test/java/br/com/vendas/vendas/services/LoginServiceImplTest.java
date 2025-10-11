@@ -372,4 +372,28 @@ class LoginServiceImplTest {
 	    Assertions.assertEquals("Erro inesperado", ex.getMessage());
 	    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
 	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	void testExcluirLoginComSucesso() {
+
+		Mockito.doNothing().when(loginRepository).excluirLogin(anyInt());
+
+		loginService.excluirLogin(1);
+
+		Mockito.verify(loginRepository, Mockito.times(1)).excluirLogin(anyInt());
+	}
+	
+	@Test
+	void testExcluirLoginFalha() {
+		Mockito.doThrow(new DefaultErrorException("Erro ao excluir o dado na base", HttpStatus.INTERNAL_SERVER_ERROR))
+		.when(loginRepository).excluirLogin(anyInt());
+
+	    DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
+	        loginService.excluirLogin(2);
+	    });
+
+	    Assertions.assertEquals("Erro ao excluir o dado na base", ex.getMessage());
+	    Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
+	}
 }

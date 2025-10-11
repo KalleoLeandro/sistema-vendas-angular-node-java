@@ -17,18 +17,21 @@ export class ListarUsuariosComponent implements OnInit {
   private loginService = inject(LoginService);
 
   public listaUsuarios = signal<ListaUsuariosResponse>({ lista: [], total: 0 });
-  public page: number = 1;  
+  public page: number = 1;
   public token: string = '';
+  public resposta: string = "";
+  public excluir: boolean = true;
+  public id: number = 0;
   public paginacao = [{
-    numero: 2, descricao: '2 por página'
-  },
-  {
-    numero: 5, descricao: '5 por página'
-  },
-  {
     numero: 10, descricao: '10 por página'
+  },
+  {
+    numero: 25, descricao: '25 por página'
+  },
+  {
+    numero: 50, descricao: '50 por página'
   }];
-  public limit = 2;
+  public limit = 10;
   public totalPages: number = 0;
 
   ngOnInit(): void {
@@ -44,16 +47,36 @@ export class ListarUsuariosComponent implements OnInit {
     this.router.navigate([`/usuarios/cadastro/${id}`]);
   }
 
-  public excluirUsuario(id: number) {
-
+  public modalExcluirUsuario(id: number) {
+    this.excluir = true;
+    this.id = id;
+    this.resposta = "Tem certeza que deseja excluir esse usuário? Essa operação é irreversível.";
+    document.getElementById("botaoModal")?.click();
   }
 
-   public carregarUsuarios(): void {
+  public excluirUsuario() {
+    this.excluir = false;
+    this.loginService.excluirUsuario(this.id, this.token).subscribe({
+      next: (response: ListaUsuariosResponse) => {
+        this.resposta = "Usuário excluído com sucesso.";
+        document.getElementById("botaoModal")?.click();
+        this.listaUsuarios.set({
+          ...this.listaUsuarios(),
+          lista: this.listaUsuarios().lista.filter(item => item.id !== this.id)
+        });
+      },
+      error: (error: any) => {
+        this.resposta = "Erro ao excluir o usuário!";
+        document.getElementById("botaoModal")?.click();
+      },
+    });
+  }
+
+  public carregarUsuarios(): void {
     this.loginService.buscarLoginsPorPagina(this.page, this.limit, this.token).subscribe({
       next: (response: ListaUsuariosResponse) => {
         this.listaUsuarios.set(response);
         this.totalPages = Math.ceil(response.total / this.limit);
-
       },
       error: (error: any) => {
         console.log(error);

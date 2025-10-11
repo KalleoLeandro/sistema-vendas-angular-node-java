@@ -1,50 +1,50 @@
-import { TestBed } from '@angular/core/testing';
+import { Renderer2, ElementRef } from '@angular/core';
 import { MainComponent } from './main.component';
-import { LoginService } from '@services/login.service';
-import { provideRouter, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { HomeComponent } from '../home/home.component';
-import { CadastroUsuarioComponent } from '@pages/usuarios/cadastro-usuario/cadastro-usuario.component';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
 
-describe('MainComponent', () => {
+describe('AppComponent (sidebar toggle)', () => {
   let component: MainComponent;
-  let loginServiceSpy: jasmine.SpyObj<LoginService>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let httpClientSpy: jasmine.SpyObj<HttpClient>;
+  let mockRenderer: jasmine.SpyObj<Renderer2>;
+  let mockElementRef: ElementRef;
 
+  beforeEach(() => {    
+    const div = document.createElement('div');
+    const btn = document.createElement('button');
+    btn.id = 'sidebarToggle';
+    div.appendChild(btn);
 
-  beforeEach(() => {
+    mockElementRef = new ElementRef(div);
+    
+    mockRenderer = jasmine.createSpyObj('Renderer2', ['listen']);    
+    component = new MainComponent(mockElementRef, mockRenderer);
+    document.body.className = '';
+    localStorage.clear();
+  });
 
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
+  it('deve adicionar a classe se localStorage tiver true', () => {
+    localStorage.setItem('sb|sidebar-toggle', 'true');
 
-    TestBed.configureTestingModule({
-      imports: [CommonModule, MainComponent],
-      providers: [
-        provideRouter([
-          {
-            path: '',
-            pathMatch: 'full',
-            component: HomeComponent,
-          },
-          {
-            path: 'cadastro/',
-            component: CadastroUsuarioComponent,
-          },
-        ]),
-        { provide: HttpClient, useValue: httpClientSpy },
-        provideHttpClientTesting
-      ],
+    component.ngAfterViewInit();
+
+    expect(document.body.classList.contains('sb-sidenav-toggled')).toBeTrue();
+  });
+
+  it('deve registrar o listener de clique', () => {
+    component.ngAfterViewInit();
+
+    expect(mockRenderer.listen).toHaveBeenCalled();
+  });
+
+  it('deve alternar classe e atualizar localStorage ao clicar', () => {    
+    mockRenderer.listen.and.callFake((element, eventName, callback) => {
+      if (eventName === 'click') {
+        callback({ preventDefault() {} });
+      }
+      return () => {};
     });
 
-    component = TestBed.createComponent(MainComponent).componentInstance;
-    loginServiceSpy = TestBed.inject(LoginService) as jasmine.SpyObj<LoginService>;
-    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-  });
+    component.ngAfterViewInit();
 
-  it('should create the component', () => {    
-    expect(component).toBeTruthy();
+    expect(document.body.classList.contains('sb-sidenav-toggled')).toBeTrue();
+    expect(localStorage.getItem('sb|sidebar-toggle')).toBe('true');
   });
-
 });

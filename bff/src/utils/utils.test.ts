@@ -1,4 +1,3 @@
-import { environments } from "@environments/environments";
 import { decriptografia, logger } from "@utils/utils";
 import * as forge from 'node-forge';
 

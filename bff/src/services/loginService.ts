@@ -191,3 +191,35 @@ export const buscarPorPagina = async (page: string, limit: string, token: string
         throw new CustomError(error.message, error.status);
     }
 }
+
+export const excluirLogin = async (id: number, token: string) =>{
+      try {
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        }
+
+        log.info("Executando a /api/login/excluir-login");
+        const res = await fetch(`${environments.BACK_END}/login/excluir-login/${id}`, options);
+        const status = res.status;
+        let retorno;        
+        if (status === 204) {            
+            retorno = {
+                status: 204,
+                message: `Usuário excluído com sucesso`
+            };
+        } else {            
+            retorno = {
+                status,
+                message: `Erro ao excluir o login`
+            };
+        }
+        return retorno;
+    } catch (error: any) {
+        log.error(`Erro: ${error}`);
+        throw new CustomError(error.message, error.status);
+    }
+}

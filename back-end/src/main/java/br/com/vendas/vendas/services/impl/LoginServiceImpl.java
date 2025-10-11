@@ -129,4 +129,14 @@ public class LoginServiceImpl implements LoginService {
 			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@Override
+	public void excluirLogin(Integer id) {		
+		try{
+			logger.info("Executando o LoginRepository.excluirLogin");
+			loginRepository.excluirLogin(id);			
+		}catch (Exception e) {
+			throw new DefaultErrorException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

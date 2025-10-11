@@ -21,10 +21,10 @@ for projeto in "${projetos[@]}"; do
     echo -e "${YELLOW}→ Projeto Java detectado. Usando Maven...${NC}"
 
     mvn clean verify sonar:sonar \
-     -Dsonar.projectKey=back-end \
-     -Dsonar.projectName='back-end' \
+     -Dsonar.projectKey=back_end \
+     -Dsonar.projectName='Back end' \
      -Dsonar.host.url=http://localhost:9000 \
-     -Dsonar.token=sqp_8dd1cbe4a419f4529350119237edbbadb574269f
+     -Dsonar.token=sqp_1f19062eac0a877223a3b708a3d81d681c818171
 
     cd - > /dev/null
 

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as loginService from '@services/loginService';
 import { CustomError } from '@errors/customError';
 import { decriptografia } from '@utils/utils';
-import { atualizarLogin, buscarPorId, buscarPorPagina, cadastrarLogin, validarLogin, validarToken } from '@controllers/loginController';
+import { atualizarLogin, buscarPorId, buscarPorPagina, cadastrarLogin, validarLogin, validarToken, excluirLogin } from '@controllers/loginController';
 import { LoginCadastroDados } from '@models/cadastroLogin';
 
 // Mocks
@@ -274,7 +274,7 @@ describe('loginController', () => {
           id: 2,
           nome: 'teste',
           cpf: '222.333.444-05',
-          login: 'teste',          
+          login: 'teste',
           perfil: 'admin'
         }
       });
@@ -286,7 +286,7 @@ describe('loginController', () => {
         id: 2,
         nome: 'teste',
         cpf: '222.333.444-05',
-        login: 'teste',        
+        login: 'teste',
         perfil: 'admin'
       });
     })
@@ -367,7 +367,7 @@ describe('loginController', () => {
               id: 2,
               nome: 'teste',
               cpf: '222.333.444-05',
-              login: 'teste',              
+              login: 'teste',
               perfil: 'admin'
             }
           ],
@@ -383,15 +383,15 @@ describe('loginController', () => {
           id: 2,
           nome: 'teste',
           cpf: '222.333.444-05',
-          login: 'teste',          
+          login: 'teste',
           perfil: 'admin'
         }],
         total: 5
       });
     })
-  
 
-   it('Deve retornar uma mensagem caso não existam items no banco de dados', async () => {
+
+    it('Deve retornar uma mensagem caso não existam items no banco de dados', async () => {
       const req = {
         body: {},
         headers: {
@@ -418,7 +418,7 @@ describe('loginController', () => {
       expect(res.json).toHaveBeenCalledWith(`Não há ítens cadastrados`);
     })
 
-     it('Deve retornar uma mensagem de erro caso retorne erros na execução', async () => {
+    it('Deve retornar uma mensagem de erro caso retorne erros na execução', async () => {
       const req = {
         body: {},
         headers: {
@@ -443,4 +443,84 @@ describe('loginController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: "Erro ao listar os logins" });
     })
   });
+
+  describe('excluirLogin', () => {
+    it('Deve remover um login', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+        params: {
+          id: 2
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.excluirLogin as jest.Mock).mockResolvedValue({
+        status: 204, message: `Usuário excluído com sucesso`
+      });
+
+      await excluirLogin(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.json).toHaveBeenCalledWith(
+        `Usuário excluído com sucesso`
+      )
+    })
+
+
+      it('Deve retornar erro ', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        },
+        params: {
+          id: 2
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.excluirLogin as jest.Mock).mockResolvedValue({
+        status: 400, message: `Erro ao excluir o login`
+      });
+
+      await excluirLogin(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(`Erro ao excluir o login`);
+    })
+
+      it('Deve retornar uma mensagem de erro caso retorne erros na execução', async () => {
+      const req = {
+        body: {},
+        headers: {
+          authorization: 'Bearer fake-token',
+        }, params: {
+          id: 2
+        }
+      } as unknown as Request;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as unknown as Response;
+
+      (loginService.excluirLogin as jest.Mock).mockRejectedValue(new CustomError('Erro inesperado', 500));
+
+      await excluirLogin(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: "Erro ao excluir o login" });
+    })
+    });
 });

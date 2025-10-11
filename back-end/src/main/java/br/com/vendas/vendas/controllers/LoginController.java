@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -140,6 +141,18 @@ public class LoginController {
 	public ResponseEntity<Map<String, Object>> listarPorPagina(@RequestParam Integer limit, @RequestParam Integer page) {
 		logger.info("Executando a LoginService.listarPorPagina");
 		return ResponseEntity.status(HttpStatus.OK).body(loginService.listarPorPagina(limit, page));
+	}
+	
+	@Operation(summary = "Faz a exclusão de um login", description = "Valida dados e exclui o login", security = @SecurityRequirement(name = "bearerAuth"))
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "204", description = "Exclusão bem-sucedida", content = @Content),
+			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
+			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
+	@DeleteMapping("/excluir-login/{id}")
+	public ResponseEntity<Void> excluirLogin(@PathVariable @Valid Integer id) {
+		logger.info("Executando a LoginService.excluirLogin");
+		loginService.excluirLogin(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 }

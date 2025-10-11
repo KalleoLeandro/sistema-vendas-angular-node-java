@@ -319,4 +319,44 @@ describe('loginService', () => {
       });
     });
   });
+
+  describe('excluirLogin', () => {
+    it('retorna mensagem de confirmação caso status === 204', async () => {
+      const id = 2;
+      const token = 'valid-token';
+
+      mockedFetch.mockResolvedValue({
+        status: 204
+      });
+      const result = await loginService.excluirLogin(id, token);
+
+      expect(result).toEqual({
+        status: 204,
+        message: `Usuário excluído com sucesso`
+      });
+    });
+
+     it('lança uma exceção ao buscar por id', async () => {
+      const id = 2;
+      const token = 'valid-token';
+      mockedFetch.mockResolvedValue({
+        status: 400,
+        json: () => Promise.resolve()
+      });
+
+      const result = await loginService.excluirLogin(id, token);
+
+      expect(result).toEqual({
+        status: 400,
+        message: `Erro ao excluir o login`
+      });
+    });
+
+    it('lança CustomError em caso de falha na rede', async () => {
+      const id = 2;
+      const token = 'valid-token';
+      mockedFetch.mockRejectedValue(new Error('Falha na rede'));
+      await expect(loginService.excluirLogin(id, token)).rejects.toThrow(CustomError);
+    });
+  })
 });

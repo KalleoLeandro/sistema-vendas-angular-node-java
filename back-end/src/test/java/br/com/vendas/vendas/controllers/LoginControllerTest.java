@@ -132,4 +132,11 @@ public class LoginControllerTest {
 		Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 		Assertions.assertNotNull(response.getBody());
 	}
+	
+	@Test
+	public void excluirLoginOk() {
+		Mockito.doNothing().when(service).excluirLogin(any());
+		ResponseEntity<Void> response = controller.excluirLogin(2);
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());		
+	}
 }

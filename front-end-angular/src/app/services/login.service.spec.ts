@@ -12,8 +12,8 @@ describe('LoginService', () => {
 
   beforeEach(() => {
 
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get','post', 'delete']);
+
 
 
     TestBed.configureTestingModule({
@@ -120,9 +120,9 @@ describe('LoginService', () => {
     it('deve chamar post com o token correto e retornar true', (done) => {
       const token = 'token123';
       const mockResponse = true;
-  
+
       httpClientSpy.post.and.returnValue(of(mockResponse));
-  
+
       service.getPerfil(token).subscribe(res => {
         expect(httpClientSpy.post).toHaveBeenCalledWith(
           `${environment.BFF}/retorna-perfil`,
@@ -135,13 +135,13 @@ describe('LoginService', () => {
         done();
       });
     });
-  
+
     it('deve lidar com erro ao chamar getPerfil', (done) => {
       const token = 'token123';
       const error = new HttpErrorResponse({ status: 403 });
-  
+
       httpClientSpy.post.and.returnValue(throwError(() => error));
-  
+
       service.getPerfil(token).subscribe({
         error: (err) => {
           expect(err.status).toBe(403);
@@ -156,9 +156,9 @@ describe('LoginService', () => {
       const token = 'token';
       const id = 1;
       const mockResponse = { nome: 'João' };
-  
+
       httpClientSpy.get = jasmine.createSpy().and.returnValue(of(mockResponse));
-  
+
       service.buscarUsuarioPorId(id, token).subscribe(res => {
         expect(httpClientSpy.get).toHaveBeenCalledWith(
           `${environment.BFF}/buscar-por-id/${id}`,
@@ -168,14 +168,14 @@ describe('LoginService', () => {
         done();
       });
     });
-  
+
     it('deve tratar erro ao buscar usuário por ID', (done) => {
       const token = 'token';
       const id = 1;
       const error = new HttpErrorResponse({ status: 404 });
-  
+
       httpClientSpy.get = jasmine.createSpy().and.returnValue(throwError(() => error));
-  
+
       service.buscarUsuarioPorId(id, token).subscribe({
         error: (err) => {
           expect(err.status).toBe(404);
@@ -184,15 +184,15 @@ describe('LoginService', () => {
       });
     });
   });
-  
+
   describe('atualizarUsuario', () => {
     it('deve fazer PUT com formulário e retornar resultado', (done) => {
       const token = 'token';
       const form = new FormGroup({ nome: new FormControl('Maria') });
       const mockResponse = { atualizado: true };
-  
+
       httpClientSpy.put = jasmine.createSpy().and.returnValue(of(mockResponse));
-  
+
       service.atualizarUsuario(form, token).subscribe(res => {
         expect(httpClientSpy.put).toHaveBeenCalledWith(
           `${environment.BFF}/atualizar-login`,
@@ -203,14 +203,14 @@ describe('LoginService', () => {
         done();
       });
     });
-  
+
     it('deve tratar erro ao atualizar usuário', (done) => {
       const token = 'token';
       const form = new FormGroup({ nome: new FormControl('Maria') });
       const error = new HttpErrorResponse({ status: 400 });
-  
+
       httpClientSpy.put = jasmine.createSpy().and.returnValue(throwError(() => error));
-  
+
       service.atualizarUsuario(form, token).subscribe({
         error: (err) => {
           expect(err.status).toBe(400);
@@ -219,15 +219,15 @@ describe('LoginService', () => {
       });
     });
   });
-  
+
   describe('cadastrarUsuario', () => {
     it('deve fazer POST com formulário e retornar resultado', (done) => {
       const token = 'token';
       const form = new FormGroup({ nome: new FormControl('João') });
       const mockResponse = { cadastrado: true };
-  
+
       httpClientSpy.post.and.returnValue(of(mockResponse));
-  
+
       service.cadastrarUsuario(form, token).subscribe(res => {
         expect(httpClientSpy.post).toHaveBeenCalledWith(
           `${environment.BFF}/cadastrar-login`,
@@ -238,14 +238,14 @@ describe('LoginService', () => {
         done();
       });
     });
-  
+
     it('deve tratar erro ao cadastrar usuário', (done) => {
       const token = 'token';
       const form = new FormGroup({ nome: new FormControl('João') });
       const error = new HttpErrorResponse({ status: 409 });
-  
+
       httpClientSpy.post.and.returnValue(throwError(() => error));
-  
+
       service.cadastrarUsuario(form, token).subscribe({
         error: (err) => {
           expect(err.status).toBe(409);
@@ -254,6 +254,80 @@ describe('LoginService', () => {
       });
     });
   });
+
+  describe('buscarLoginsPorPagina', () => {
+    it('deve buscar lista de logins por página', (done) => {
+      const page = 1;
+      const limit = 10;
+      const token = 'token';
+      const mockResponse = [{ nome: 'João' }];
+
+      httpClientSpy.get = jasmine.createSpy().and.returnValue(of(mockResponse));
+
+      service.buscarLoginsPorPagina(page, limit, token).subscribe(res => {
+        expect(httpClientSpy.get).toHaveBeenCalledWith(
+          `${environment.BFF}/buscar-por-pagina?page=${page}&limit=${limit}`,
+          jasmine.anything()
+        );
+        expect(res).toEqual(mockResponse);
+        done();
+      });
+    });
+
+    it('deve dar erro ao buscar logins por página', (done) => {
+      const page = 1;
+      const limit = 10;
+      const token = 'token';
+
+      const error = new HttpErrorResponse({ status: 409 });
+
+      httpClientSpy.get.and.returnValue(throwError(() => error));
+
+      service.buscarLoginsPorPagina(page, limit, token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(409);
+          done();
+        }
+      });
+    })
+  });
+
+  describe('excluirUsuario', () => {
+    it('deve fazer DELETE ao excluir usuário', (done) => {
+      const token = 'token';
+      const id = 2;
+
+      const mockResponse = { message: 'Usuário excluído com sucesso!' };
+
+      httpClientSpy.delete = jasmine.createSpy().and.returnValue(of(mockResponse));
+
+      service.excluirUsuario(id, token).subscribe(res => {
+        expect(httpClientSpy.delete).toHaveBeenCalledWith(
+          `${environment.BFF}/excluir-login/${id}`,
+          jasmine.anything()
+        );
+        expect(res).toEqual(mockResponse);
+        done();
+      });
+    })
+
+    it('deve dar erro ao excluir usuário', (done) => {
+      const token = 'token';
+      const id = 2;
+
+      const error = new HttpErrorResponse({ status: 409 });
+
+      httpClientSpy.delete.and.returnValue(throwError(() => error));
+
+      service.excluirUsuario(id, token).subscribe({
+        error: (err) => {
+          expect(err.status).toBe(409);
+          done();
+        }
+      });
+    })
+
+  })
 });
 
 

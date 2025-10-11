@@ -14,7 +14,7 @@ describe('ListarUsuariosComponent', () => {
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    mockLoginService = jasmine.createSpyObj('LoginService', ['buscarLoginsPorPagina']);
+    mockLoginService = jasmine.createSpyObj('LoginService', ['buscarLoginsPorPagina', 'excluirUsuario']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -40,7 +40,7 @@ describe('ListarUsuariosComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockLoginService.buscarLoginsPorPagina).toHaveBeenCalledWith(1, 2, 'fake-token');
+    expect(mockLoginService.buscarLoginsPorPagina).toHaveBeenCalledWith(1, 10, 'fake-token');
     expect(component.listaUsuarios()).toEqual(response);
   });
 
@@ -105,5 +105,54 @@ describe('ListarUsuariosComponent', () => {
     component.carregarUsuarios();
 
     expect(consoleSpy).toHaveBeenCalledWith(jasmine.any(Error));
+  });
+
+  it('deve mudar tamanho da página e recarregar', () => {
+    spyOn(component, 'carregarUsuarios');
+    component.page = 3;
+    component.mudarTamanho();
+
+    expect(component.page).toBe(1);
+    expect(component.carregarUsuarios).toHaveBeenCalled();
+  });
+
+  it('deve ir para página e recarregar os dados', () => {
+    spyOn(component, 'carregarUsuarios');
+    component.page = 3;
+    component.totalPages = 25;
+
+    component.irParaPagina(2);
+    expect(component.carregarUsuarios).toHaveBeenCalled();
+  });
+
+  it('abrir o modal excluir', () => {
+    component.page = 3;
+    component.totalPages = 25;
+
+    component.modalExcluirUsuario(2);
+    expect(component.id).toEqual(2);
+    expect(component.excluir).toBeTrue();
+    expect(component.resposta).toEqual("Tem certeza que deseja excluir esse usuário? Essa operação é irreversível.");
+  });
+
+  it('executar exclusao ok', () => {
+     const response: any = {
+      message: `Usuário excluído com sucesso.`
+    };
+
+    mockLoginService.excluirUsuario.and.returnValue(of(response));    
+
+    component.excluirUsuario();  
+    expect(component.excluir).toBeFalse();
+    expect(component.resposta).toEqual("Usuário excluído com sucesso.");
+  });
+
+   it('executar exclusao falha', () => {
+
+    mockLoginService.excluirUsuario.and.returnValue(throwError(() => new Error('Erro')));    
+
+    component.excluirUsuario();  
+    expect(component.excluir).toBeFalse();
+    expect(component.resposta).toEqual("Erro ao excluir o usuário!");
   });
 });
