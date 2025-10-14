@@ -57,18 +57,7 @@ services:
     ports:
       - "4200:80"
     depends_on:
-      - bff
-  
-  front-end-react:
-    build:
-      context: ./front-end-react
-    container_name: sistema_vendas_front-end-react
-    networks:
-      - minharede
-    ports:
-      - "4000:80"
-    depends_on:
-      - bff
+      - bff  
       
   prometheus:
     container_name: sistema_vendas_prometheus

@@ -18,10 +18,4 @@ npm install
 npm run build
 cd ..
 
-echo "Buildando front-end React..."
-cd front-end-react
-npm install
-npm run build
-cd ..
-
 echo "Builds concluídos!"

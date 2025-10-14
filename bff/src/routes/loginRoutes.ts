@@ -339,8 +339,8 @@ loginRoutes.get("/buscar-por-pagina", middleware.verificaTokenValido, loginContr
 
 /**
  * @swagger
- * /atualizar-login:
- *   put:
+ * /excluir-login:
+ *   delete:
  *     summary: Atualização de Login
  *     tags:
  *       - Login
