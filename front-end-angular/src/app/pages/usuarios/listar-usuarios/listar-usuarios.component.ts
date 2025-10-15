@@ -50,7 +50,7 @@ export class ListarUsuariosComponent implements OnInit {
   public modalExcluirUsuario(id: number) {
     this.excluir = true;
     this.id = id;
-    this.resposta = "Tem certeza que deseja excluir esse usuário? Essa operação é irreversível.";
+    this.resposta = "Tem certeza que deseja excluir esse usuário(Essa operação é irreversível)?";
     document.getElementById("botaoModal")?.click();
   }
 
@@ -58,8 +58,7 @@ export class ListarUsuariosComponent implements OnInit {
     this.excluir = false;
     this.loginService.excluirUsuario(this.id, this.token).subscribe({
       next: (response: ListaUsuariosResponse) => {
-        this.resposta = "Usuário excluído com sucesso.";
-        document.getElementById("botaoModal")?.click();
+        this.resposta = "Usuário excluído com sucesso.";        
         this.listaUsuarios.set({
           ...this.listaUsuarios(),
           lista: this.listaUsuarios().lista.filter(item => item.id !== this.id)
@@ -67,7 +66,6 @@ export class ListarUsuariosComponent implements OnInit {
       },
       error: (error: any) => {
         this.resposta = "Erro ao excluir o usuário!";
-        document.getElementById("botaoModal")?.click();
       },
     });
   }
