@@ -47,7 +47,6 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }
@@ -63,7 +62,6 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }
@@ -79,7 +77,6 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }
@@ -95,7 +92,6 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }
@@ -111,7 +107,6 @@ export class LoginService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }
@@ -123,11 +118,10 @@ export class LoginService {
     );
   }
 
-  public excluirUsuario(id: number, token: string): Observable<any> {
+  public excluirUsuario(id: number): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'authorization': `${token}`,
       }),
       withCredentials: true
     }

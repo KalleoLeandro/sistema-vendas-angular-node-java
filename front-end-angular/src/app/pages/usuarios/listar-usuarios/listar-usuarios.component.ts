@@ -56,7 +56,7 @@ export class ListarUsuariosComponent implements OnInit {
 
   public excluirUsuario() {
     this.excluir = false;
-    this.loginService.excluirUsuario(this.id, this.token).subscribe({
+    this.loginService.excluirUsuario(this.id).subscribe({
       next: (response: ListaUsuariosResponse) => {
         this.resposta = "Usuário excluído com sucesso.";        
         this.listaUsuarios.set({
@@ -65,6 +65,7 @@ export class ListarUsuariosComponent implements OnInit {
         });
       },
       error: (error: any) => {
+        console.log(error);
         this.resposta = "Erro ao excluir o usuário!";
       },
     });

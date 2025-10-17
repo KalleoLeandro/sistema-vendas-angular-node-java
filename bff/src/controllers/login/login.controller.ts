@@ -276,9 +276,9 @@ export class LoginController {
             example: { message: 'Erro ao excluir o logins' },
         },
     })
-    async excluirLogin(@Param('id') id: number, req: Request, res: Response) {
+    async excluirLogin(@Param('id') id: number, @Req() req: Request, @Res() res: Response) {
         const token: string = req.cookies.jwt;
         const retorno = await this.loginService.excluirLogin(id, token);
-        return res.status(retorno.status).json(retorno.message);
+        return res.status(retorno.status).json({message: retorno.message});
     }
 }
