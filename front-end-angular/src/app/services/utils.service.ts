@@ -17,12 +17,13 @@ export class UtilsService {
         'Content-Type': 'application/json',
         'authorization': `${token}`,
       }),
-    }
+      withCredentials: true
+    }  
 
     return this.httpClient.post<any>(`${this.url()}/validar-cpf`, { cpf }, httpOptions).pipe(
-      catchError((error: HttpErrorResponse) =>
-        throwError(() => error)
-      )
-    );
+    catchError((error: HttpErrorResponse) =>
+      throwError(() => error)
+    )
+  );
   }
 }

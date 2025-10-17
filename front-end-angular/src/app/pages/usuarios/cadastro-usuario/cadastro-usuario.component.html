@@ -48,7 +48,7 @@
                 <label>
                     Perfil
                 </label>
-                <select class="form-control" ngModel formControlName="perfil">
+                <select class="form-control" formControlName="perfil">
                     <option value="" selected>--Selecione o perfil--</option>
                     <option *ngFor="let item of perfil; let i = index" [value]="item">{{item}}</option>
                 </select>

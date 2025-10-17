@@ -14,7 +14,13 @@ export class LoginService {
   private url = signal(environment.BFF);
 
   public validarLogin(hash: string): Observable<LoginReponse> {
-    return this.httpClient.post<LoginReponse>(`${this.url()}/validar-login`, { hash }).pipe(
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      withCredentials: true
+    };
+    return this.httpClient.post<LoginReponse>(`${this.url()}/validar-login`, { hash }, httpOptions).pipe(
       shareReplay(),
       catchError((error: HttpErrorResponse) =>
         throwError(() => error)
@@ -22,12 +28,12 @@ export class LoginService {
     )
   }
 
-  public validarToken(token: string): Observable<Boolean> {
+  public validarToken(): Observable<Boolean> {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'authorization': `${token}`,
-      })
+        'Content-Type': 'application/json'
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.post<Boolean>(`${this.url()}/validar-token`, null, httpOptions).pipe(
@@ -42,7 +48,8 @@ export class LoginService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.post<Boolean>(`${this.url()}/retorna-perfil`, null, httpOptions).pipe(
@@ -57,7 +64,8 @@ export class LoginService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.get<Boolean>(`${this.url()}/buscar-por-id/${id}`, httpOptions).pipe(
@@ -67,12 +75,13 @@ export class LoginService {
     );
   }
 
-  public atualizarUsuario(formulario: FormGroup<any>, token: string): Observable<any>  {
+  public atualizarUsuario(formulario: FormGroup<any>, token: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.put<any>(`${this.url()}/atualizar-login`, formulario.getRawValue(), httpOptions).pipe(
@@ -82,12 +91,13 @@ export class LoginService {
     );
   }
 
-  public cadastrarUsuario(formulario: FormGroup<any>, token: string): Observable<any>  {
+  public cadastrarUsuario(formulario: FormGroup<any>, token: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.post<any>(`${this.url()}/cadastrar-login`, formulario.getRawValue(), httpOptions).pipe(
@@ -97,12 +107,13 @@ export class LoginService {
     );
   }
 
-  public buscarLoginsPorPagina(page: number, limit: number, token: string): Observable<any>  {
+  public buscarLoginsPorPagina(page: number, limit: number, token: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.get<any>(`${this.url()}/buscar-por-pagina?page=${page}&limit=${limit}`, httpOptions).pipe(
@@ -117,7 +128,8 @@ export class LoginService {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'authorization': `${token}`,
-      })
+      }),
+      withCredentials: true
     }
 
     return this.httpClient.delete<any>(`${this.url()}/excluir-login/${id}`, httpOptions).pipe(

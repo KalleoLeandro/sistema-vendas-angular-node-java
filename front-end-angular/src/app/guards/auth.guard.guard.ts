@@ -6,13 +6,12 @@ import { catchError, map, of } from 'rxjs';
 export const authGuardGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const authService = inject(LoginService);
   const router = inject(Router);
-  const token: string = sessionStorage.getItem('token') as string;
-  return authService.validarToken(token).pipe(
+  return authService.validarToken().pipe(
     map((isAuthenticated) => {
       if (isAuthenticated) {
         return true;
       } else {
-        sessionStorage.clear();        
+        sessionStorage.clear();
         return router.createUrlTree(['login']);
       }
     }),

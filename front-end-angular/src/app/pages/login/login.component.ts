@@ -16,11 +16,10 @@ export class LoginComponent implements OnInit{
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private loginService = inject(LoginService);
-  public token:string = sessionStorage.getItem('token') as string || "";
+  private loginService = inject(LoginService); 
 
   ngOnInit(): void {    
-    this.loginService.validarToken(this.token).subscribe({
+    this.loginService.validarToken().subscribe({
       next: (res) => {
         if(res === true){
           this.router.navigate(['/home']);

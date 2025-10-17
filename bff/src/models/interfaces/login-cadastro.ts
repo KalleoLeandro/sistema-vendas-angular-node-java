@@ -1,4 +1,4 @@
-export interface LoginCadastroDados {
+export interface LoginCadastro {
     id?: number;
     nome: string;
     cpf: string;

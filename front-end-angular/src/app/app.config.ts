@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideEnvironmentNgxMask, provideNgxMask } from 'ngx-mask';
+import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 

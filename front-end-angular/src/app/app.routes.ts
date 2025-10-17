@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuardGuard } from '@guards/auth.guard.guard';
+import { CadastrarProdutoComponent } from '@pages/produtos/cadastrar-produto/cadastrar-produto.component';
 
 
 export const routes: Routes = [
@@ -24,12 +25,12 @@ export const routes: Routes = [
                     { path: 'listar', loadComponent: () => import("@pages/usuarios/listar-usuarios/listar-usuarios.component").then(c => c.ListarUsuariosComponent) }
                 ]
             },
-            /*{
+            {
                 path: 'produtos', children: [
-                    { path: 'cadastro', component: CadastrarProdutoComponent },
-                    { path: 'cadastro/:id', component: CadastrarProdutoComponent }
+                    { path: 'cadastro',loadComponent: () => import("@pages/produtos/cadastrar-produto/cadastrar-produto.component").then(c => c.CadastrarProdutoComponent) },
+                    { path: 'cadastro/:id',loadComponent: () => import("@pages/produtos/cadastrar-produto/cadastrar-produto.component").then(c => c.CadastrarProdutoComponent) },
                 ]
-            }*/
+            }
         ]
     },    
     {

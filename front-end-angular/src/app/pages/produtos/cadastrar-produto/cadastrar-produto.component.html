@@ -1,0 +1,89 @@
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="card mb-4">
+        <div class="card-header py-3 mb-2">
+            <h6 class="m-0 font-weight-bold text-secondary">Cadastro de Produtos</h6>
+        </div>
+        <div class="col-12">
+            <form [formGroup]="cadastroForm">
+                <input type="text" name="id" id="id" formControlName="id">
+                <div class="form-group">
+                    <label>
+                        Nome
+                    </label>
+                    <input type="text" formControlName="nome" class="form-control" name="nome">
+                </div>
+                <div class="form-group">
+                    <label>
+                        Preço de Custo
+                    </label>
+                    <input formControlName="precoCusto" class="form-control" name="precoCusto" currencyMask [options]="{prefix: 'R$', thousands: '.', decimal: ',', align: 'left', max: 10000}"   (input)="onChangePreco($event)">
+                </div>
+                <div class="form-group">
+                    <label>
+                        Preço de Venda
+                    </label>
+                    <input formControlName="precoVenda" class="form-control" name="precoVenda" currencyMask [options]="{prefix: 'R$', thousands: '.', decimal: ',', align: 'left', max: 10000}"   (input)="onChangePreco($event)">
+                </div>
+                <div class="form-group">
+                    <label>
+                        Quantidade
+                    </label>
+                    <input type="number" formControlName="quantidade" class="form-control" name="quantidade">
+                </div>
+                <label>
+                    Medida
+                </label>
+                <select class="form-control mt-2" ngModel formControlName="medida">
+                    <option value="" selected>--Selecione a medida--</option>
+                    <option *ngFor="let item of medida; let i = index" [value]="item">{{item}}</option>
+                </select>
+                <label>
+                    Categoria
+                </label>
+                <select class="form-control mt-3" ngModel formControlName="categoria">
+                    <option value="" selected>--Selecione a categoria--</option>
+                    <option *ngFor="let item of categoria; let i = index" [value]="item">{{item}}</option>
+                </select>
+                <div class="botoes mt-5 mb-3">
+
+                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid">Cadastrar</button>
+                    <button class="btn btn-warning" (click)="$event.preventDefault(); limparFormulario()">Limpar
+                        Formulário</button>
+                </div>
+                <div id="modal">
+                    <button type="button" id="botaoModal" data-toggle="modal" data-target="#modalConfirmacao">
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalConfirmacao" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacao">Cadastro de Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <span>{{resposta}}</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (click)="redirecionar()">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- /.container-fluid -->
+
+<!-- End of Main Content -->
