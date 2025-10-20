@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,16 +19,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Utils", description = "Endpoints de validações e utilitários")
 @RestController
 @RequestMapping("/utils")
+@RequiredArgsConstructor
 public class UtilsController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UtilsController.class);
-
-	@Autowired
-	private UtilsService utilsService;
+	
+	private final UtilsService utilsService;
 
 	@Operation(summary = "Valida o cpf", description = "Verifica se o cpf é valido e retorna true ou false")
 	@ApiResponses(value = {

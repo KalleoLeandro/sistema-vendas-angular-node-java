@@ -1,158 +1,155 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ListarUsuariosComponent } from './listar-usuarios.component';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { LoginService } from '@services/login.service';
 import { ListaUsuariosResponse } from '@models/ListaUsuariosResponse';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { LoginService } from '@services/login.service';
 
 describe('ListarUsuariosComponent', () => {
   let component: ListarUsuariosComponent;
-  let fixture: ComponentFixture<ListarUsuariosComponent>;
-  let mockLoginService: jasmine.SpyObj<LoginService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let routerMock: any;
+  let loginServiceMock: any;
 
-  beforeEach(() => {
-    mockLoginService = jasmine.createSpyObj('LoginService', ['buscarLoginsPorPagina', 'excluirUsuario']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+  const mockResponse: ListaUsuariosResponse = {
+    lista: [{ id: 1, nome: 'Teste', cpf: '222.333.444-05', login: 'teste', perfil: 'adm', active: true}],
+    total: 1
+  };
+
+  const setup = () => {
+    routerMock = { navigate: jasmine.createSpy('navigate') };
+
+    loginServiceMock = {
+      buscarLoginsPorPagina: jasmine.createSpy('buscarLoginsPorPagina').and.returnValue(of(mockResponse)),
+      excluirUsuario: jasmine.createSpy('excluirUsuario').and.returnValue(of({}))
+    };
 
     TestBed.configureTestingModule({
-      imports: [ListarUsuariosComponent],
       providers: [
-        { provide: LoginService, useValue: mockLoginService },
-        { provide: Router, useValue: mockRouter },
+        { provide: Router, useValue: routerMock },
+        { provide: LoginService, useValue: loginServiceMock }
       ]
     });
 
-    fixture = TestBed.createComponent(ListarUsuariosComponent);
-    component = fixture.componentInstance;
-    spyOn(sessionStorage, 'getItem').and.returnValue('fake-token');
+    component = TestBed.createComponent(ListarUsuariosComponent).componentInstance;
+  };
+
+  beforeEach(() => {
+    setup();
   });
 
-  it('deve instanciar o componente', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('deve carregar os usuários no ngOnInit', () => {
-    const response: ListaUsuariosResponse = { lista: [], total: 0 };
-    mockLoginService.buscarLoginsPorPagina.and.returnValue(of(response));
-
+  it('deve chamar carregarUsuarios no ngOnInit', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
     component.ngOnInit();
-
-    expect(mockLoginService.buscarLoginsPorPagina).toHaveBeenCalledWith(1, 10, 'fake-token');
-    expect(component.listaUsuarios()).toEqual(response);
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('deve calcular o total de páginas corretamente', () => {
-    const response: ListaUsuariosResponse = {
-      lista: [{
-        id: 1, nome: 'Teste',
-        cpf: '',
-        login: '',
-        perfil: '',
-        active: false
-      }], total: 5
-    };
-    component.limit = 2;
-    mockLoginService.buscarLoginsPorPagina.and.returnValue(of(response));
-
+  it('deve carregar usuários com sucesso', () => {
     component.carregarUsuarios();
-
-    expect(component.totalPages).toBe(3);
+    expect(loginServiceMock.buscarLoginsPorPagina).toHaveBeenCalledWith(1, 10);
+    expect(component.listaUsuarios().lista.length).toBe(1);
+    expect(component.totalPages).toBe(1);
   });
 
-  it('deve navegar para a página de edição do usuário', () => {
-    component.alterarUsuario(10);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/usuarios/cadastro/10']);
+  it('deve tratar erro ao carregar usuários', () => {
+    loginServiceMock.buscarLoginsPorPagina.and.returnValue(throwError(() => new Error('Erro')));
+    component.carregarUsuarios();
+    expect(loginServiceMock.buscarLoginsPorPagina).toHaveBeenCalled();
   });
 
-  it('não deve mudar de página se número inválido for passado', () => {
-    spyOn(component, 'carregarUsuarios');
+  it('deve navegar para tela de alteração', () => {
+    component.alterarUsuario(5);
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/usuarios/cadastro/5']);
+  });
+
+  it('deve abrir modal ao chamar modalExcluirUsuario', () => {
+    const clickSpy = jasmine.createSpy('click');
+    spyOn(document, 'getElementById').and.returnValue({ click: clickSpy } as any);
+
+    component.modalExcluirUsuario(1);
+
+    expect(component.excluir).toBeTrue();
+    expect(component.id).toBe(1);
+    expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('deve excluir usuário com sucesso', () => {
+    component.listaUsuarios.set(mockResponse);
+    component.id = 1;
+
+    component.excluirUsuario();
+
+    expect(loginServiceMock.excluirUsuario).toHaveBeenCalledWith(1);
+    expect(component.resposta).toBe('Usuário excluído com sucesso.');
+    expect(component.listaUsuarios().lista.length).toBe(0);
+  });
+
+  it('deve tratar erro ao excluir usuário', () => {
+    loginServiceMock.excluirUsuario.and.returnValue(throwError(() => new Error('Erro')));
+
+    component.id = 1;
+    component.listaUsuarios.set(mockResponse);
+
+    component.excluirUsuario();
+
+    expect(component.resposta).toBe('Erro ao excluir o usuário!');
+  });
+
+  it('deve mudar o tamanho e recarregar', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
+    component.mudarTamanho();
+    expect(component.page).toBe(1);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('deve ir para página válida', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
     component.totalPages = 5;
-
-    component.irParaPagina(0);
-    component.irParaPagina(6);
-
-    expect(component.carregarUsuarios).not.toHaveBeenCalled();
+    component.irParaPagina(2);
+    expect(component.page).toBe(2);
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('deve ir para próxima e página anterior', () => {
-    spyOn(component, 'carregarUsuarios');
+  it('não deve ir para página inválida', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
+    component.totalPages = 5;
+    component.irParaPagina(10);
+    expect(component.page).toBe(1);
+    expect(spy).not.toHaveBeenCalled();
+  });
 
+  it('deve ir para página anterior', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
     component.page = 2;
+    component.paginaAnterior();
+    expect(component.page).toBe(1);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('não deve ir para página anterior quando page = 1', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
+    component.page = 1;
+    component.paginaAnterior();
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('deve ir para próxima página', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
+    component.page = 1;
     component.totalPages = 5;
     component.proximaPagina();
-    expect(component.page).toBe(3);
-
-    component.paginaAnterior();
     expect(component.page).toBe(2);
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('deve mudar tamanho da página e recarregar', () => {
-    spyOn(component, 'carregarUsuarios');
-    component.page = 3;
-    component.mudarTamanho();
-
-    expect(component.page).toBe(1);
-    expect(component.carregarUsuarios).toHaveBeenCalled();
-  });
-
-  it('deve lidar com erro ao carregar usuários', () => {
-    const consoleSpy = spyOn(console, 'log');
-    mockLoginService.buscarLoginsPorPagina.and.returnValue(throwError(() => new Error('Erro')));
-
-    component.carregarUsuarios();
-
-    expect(consoleSpy).toHaveBeenCalledWith(jasmine.any(Error));
-  });
-
-  it('deve mudar tamanho da página e recarregar', () => {
-    spyOn(component, 'carregarUsuarios');
-    component.page = 3;
-    component.mudarTamanho();
-
-    expect(component.page).toBe(1);
-    expect(component.carregarUsuarios).toHaveBeenCalled();
-  });
-
-  it('deve ir para página e recarregar os dados', () => {
-    spyOn(component, 'carregarUsuarios');
-    component.page = 3;
-    component.totalPages = 25;
-
-    component.irParaPagina(2);
-    expect(component.carregarUsuarios).toHaveBeenCalled();
-  });
-
-  it('abrir o modal excluir', () => {
-    component.page = 3;
-    component.totalPages = 25;
-
-    component.modalExcluirUsuario(2);
-    expect(component.id).toEqual(2);
-    expect(component.excluir).toBeTrue();
-    expect(component.resposta).toEqual("Tem certeza que deseja excluir esse usuário? Essa operação é irreversível.");
-  });
-
-  it('executar exclusao ok', () => {
-     const response: any = {
-      message: `Usuário excluído com sucesso.`
-    };
-
-    mockLoginService.excluirUsuario.and.returnValue(of(response));    
-
-    component.excluirUsuario();  
-    expect(component.excluir).toBeFalse();
-    expect(component.resposta).toEqual("Usuário excluído com sucesso.");
-  });
-
-   it('executar exclusao falha', () => {
-
-    mockLoginService.excluirUsuario.and.returnValue(throwError(() => new Error('Erro')));    
-
-    component.excluirUsuario();  
-    expect(component.excluir).toBeFalse();
-    expect(component.resposta).toEqual("Erro ao excluir o usuário!");
+  it('não deve ir para próxima página quando já está na última', () => {
+    const spy = spyOn(component, 'carregarUsuarios');
+    component.page = 5;
+    component.totalPages = 5;
+    component.proximaPagina();
+    expect(spy).not.toHaveBeenCalled();
   });
 });

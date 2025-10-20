@@ -34,13 +34,8 @@ export class ListarUsuariosComponent implements OnInit {
   public limit = 10;
   public totalPages: number = 0;
 
-  ngOnInit(): void {
-    this.token = sessionStorage.getItem('token') || '';
+  ngOnInit(): void {    
     this.carregarUsuarios();
-  }
-
-  public alterarPagina() {
-
   }
 
   public alterarUsuario(id: number) {
@@ -72,7 +67,7 @@ export class ListarUsuariosComponent implements OnInit {
   }
 
   public carregarUsuarios(): void {
-    this.loginService.buscarLoginsPorPagina(this.page, this.limit, this.token).subscribe({
+    this.loginService.buscarLoginsPorPagina(this.page, this.limit).subscribe({
       next: (response: ListaUsuariosResponse) => {
         this.listaUsuarios.set(response);
         this.totalPages = Math.ceil(response.total / this.limit);

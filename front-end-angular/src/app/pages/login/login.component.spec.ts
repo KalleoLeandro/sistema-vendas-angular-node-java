@@ -1,88 +1,86 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginComponent } from './login.component';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { LoginService } from '@services/login.service';
-import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-
-import { CommonModule } from '@angular/common';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { LoginReponse } from '@models/LoginReponse';
-
-
+import { Router } from '@angular/router';
+import { LoginService } from '@services/login.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let loginService: jasmine.SpyObj<LoginService>;
-  let router: jasmine.SpyObj<Router>;
+  let loginServiceMock: jasmine.SpyObj<LoginService>;
+  let routerMock: jasmine.SpyObj<Router>;
 
-  beforeEach(() => {
-    const loginServiceSpy = jasmine.createSpyObj('LoginService', ['validarToken', 'validarLogin']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+  beforeEach(async () => {
+    loginServiceMock = jasmine.createSpyObj('LoginService', ['validarToken', 'validarLogin']);
+    routerMock = jasmine.createSpyObj('Router', ['navigate']);
 
-    TestBed.configureTestingModule({      
-      imports: [ReactiveFormsModule, CommonModule, LoginComponent],
+    await TestBed.configureTestingModule({
+      imports: [LoginComponent, ReactiveFormsModule, FormsModule],
       providers: [
-        FormBuilder,
-        { provide: LoginService, useValue: loginServiceSpy },  
-        { provide: Router, useValue: routerSpy},
-        provideHttpClientTesting
-      ],
-    });
+        { provide: LoginService, useValue: loginServiceMock },
+        { provide: Router, useValue: routerMock }
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    loginService = TestBed.inject(LoginService) as jasmine.SpyObj<LoginService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  it('should create the component', () => {    
-    expect(component).toBeTruthy();
+  it('deve redirecionar para /home se o token for válido no ngOnInit', () => {
+    loginServiceMock.validarToken.and.returnValue(of(true));
+    
+    fixture.detectChanges(); // dispara o ngOnInit
+
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
   });
 
-  it('should navigate to /home if token is valid on ngOnInit', () => {
-    loginService.validarToken.and.returnValue(of(true));
-  
-    component.ngOnInit();
-  
-    expect(loginService.validarToken).toHaveBeenCalledWith(component.token);
-    expect(router.navigate).toHaveBeenCalledWith(['/home']);
+  it('não deve redirecionar se o token for inválido no ngOnInit', () => {
+    loginServiceMock.validarToken.and.returnValue(of(false));
+
+    fixture.detectChanges();
+
+    expect(routerMock.navigate).not.toHaveBeenCalled();
   });
 
-  it('should store token and navigate to /home on successful login', () => {
-    const mockResponse:LoginReponse = { token: '123abc', userName: 'Kalleo', status: 200, expiration: '01/01/2000', message: 'Login ok'};
-    loginService.validarLogin.and.returnValue(of(mockResponse));
-  
-    component.loginForm.setValue({ login: 'kalleo', senha: '1234' });
-  
+  it('deve realizar login com sucesso e redirecionar para /home', () => {
+    loginServiceMock.validarToken.and.returnValue(of(false)); // pra não redirecionar no ngOnInit
+    loginServiceMock.validarLogin.and.returnValue(of({ token: 'abc123', expiration: '20000', status: 200, userName: 'user', message: 'teste' }));
+
+    fixture.detectChanges();
+
+    component.loginForm.setValue({ login: 'user', senha: '123' });
     component.logar();
-  
-    expect(loginService.validarLogin).toHaveBeenCalled();
-    expect(sessionStorage.getItem('token')).toBe(mockResponse.token!);
-    expect(sessionStorage.getItem('userName')).toBe(mockResponse.userName!);
-    expect(router.navigate).toHaveBeenCalledWith(['/home']);
+
+    expect(sessionStorage.getItem('token')).toBe('abc123');
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
   });
 
-  it('should reset form and set invalido=true on 401 error', () => {
-    const errorResponse = { status: 401 };
-    loginService.validarLogin.and.returnValue(throwError(() => errorResponse));
-  
-    component.loginForm.setValue({ login: 'kalleo', senha: 'errado' });
+  it('deve limpar o formulário e setar invalido=true quando o login der 401', () => {
+    loginServiceMock.validarToken.and.returnValue(of(false));
+
+    loginServiceMock.validarLogin.and.returnValue(
+      throwError(() => ({ status: 401 }))
+    );
+
+    fixture.detectChanges();
+    component.loginForm.setValue({ login: 'user', senha: '123' });
     component.logar();
-  
-    expect(component.loginForm.value.login).toBe('');
-    expect(component.loginForm.value.senha).toBe('');
+
     expect(component.invalido).toBeTrue();
+    expect(component.loginForm.value).toEqual({ login: '', senha: '' });
   });
 
-  it('should set invalido=false when change is triggered with any input value', () => {
+  it('deve mudar invalido para false ao chamar change() quando houver valores', () => {
+    loginServiceMock.validarToken.and.returnValue(of(false));
+    fixture.detectChanges();
+
     component.invalido = true;
-    component.loginForm.setValue({ login: 'user', senha: '' });
-  
+    component.loginForm.setValue({ login: 'user', senha: '123' });
+
     component.change();
-  
+
     expect(component.invalido).toBeFalse();
   });
+
 });

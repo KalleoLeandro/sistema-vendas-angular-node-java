@@ -39,8 +39,6 @@ export class CadastroUsuarioComponent {
   public hoje: string = "";
   public id: number | null = null;
 
-  public token: string = sessionStorage.getItem('token') || '';
-
 
 
   constructor() {
@@ -52,7 +50,7 @@ export class CadastroUsuarioComponent {
 
 
   public carregarUsuario() {
-    this.loginService.buscarUsuarioPorId(this.id, this.token).subscribe({
+    this.loginService.buscarUsuarioPorId(this.id).subscribe({
       next: (response) => {
         this.cadastroForm.controls['id'].patchValue(response.id);
         this.cadastroForm.controls['nome'].patchValue(response.nome);
@@ -70,7 +68,7 @@ export class CadastroUsuarioComponent {
   public cpfValido() {
     const cpf = this.cadastroForm.controls['cpf'].value.replaceAll(".", "").replaceAll("-", "");
     if (cpf.length === 11) {
-      this.utilsService.validarCpf(cpf, this.token).subscribe({
+      this.utilsService.validarCpf(cpf).subscribe({
         next: (res) => {
           this.cpfInvalido = !res.valido;
         },
@@ -85,8 +83,8 @@ export class CadastroUsuarioComponent {
 
   public cadastrarAtualizarUsuario() {
     (this.id !== null && this.id !== undefined ?
-      this.loginService.atualizarUsuario(this.cadastroForm, this.token as string)
-      : this.loginService.cadastrarUsuario(this.cadastroForm, this.token as string)).subscribe({
+      this.loginService.atualizarUsuario(this.cadastroForm)
+      : this.loginService.cadastrarUsuario(this.cadastroForm)).subscribe({
         next: (res) => {
           this.id != null && this.id != undefined ? this.resposta = "Dados atualizados com sucesso!" : this.resposta = "Dados cadastrados com sucesso!";
           document.getElementById("botaoModal")?.click();

@@ -11,11 +11,10 @@ export class UtilsService {
   private httpClient = inject(HttpClient);
   private url = signal(environment.BFF);
 
-  public validarCpf(cpf: string, token: string): Observable<any> {
+  public validarCpf(cpf: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'authorization': `${token}`,
+        'Content-Type': 'application/json',        
       }),
       withCredentials: true
     }  

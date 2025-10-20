@@ -1,80 +1,18 @@
 import { environments } from '@environments/environments';
 import { CustomError } from '@errors/custom/custom-error';
 import { GenericResponseDto } from '@models/dto/generic-response-dto';
-import { LoginAtualizacaoDto } from '@models/dto/login-atualizacao-dto';
-import { LoginCadastroDto } from '@models/dto/login-cadastro-dto';
-import { LoginResponseDto } from '@models/dto/login-reponse-dto';
-import { LoginRequest } from '@models/interfaces/login-request';
-import { LoginResponse } from '@models/interfaces/login-response';
+import { ProdutoAtualizacaoDto } from '@models/dto/produto-atualizacao-dto';
+import { ProdutoCadastroDto } from '@models/dto/produto-cadastro-dto';
 import { Injectable } from '@nestjs/common';
 import { logger } from '@utils/utils';
+import { Logger } from 'winston';
 
-const log = logger;
+const log: Logger = logger;
 
 @Injectable()
-export class LoginService {
+export class ProdutoService {
 
-    async validarLogin(body: LoginRequest) {
-        try {
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            };
-
-            log.info("Executando a /api/login/validar-login");
-            const res = await fetch(`${environments.BACK_END}/login/validar-login`, options);
-            const statusCode = res.status;
-            const response: LoginResponseDto = await res.json();
-            let retorno: LoginResponseDto;
-
-            if (statusCode === 200) {
-                retorno = {
-                    token: response.token,
-                    expiration: response.expiration,
-                    userName: response.userName,
-                    status: 200
-                };
-            } else if (statusCode === 401) {
-                retorno = {
-                    status: 401,
-                    message: response.message
-                };
-            } else {
-
-                retorno = {
-                    status: 500,
-                    message: response.message
-                };
-            }
-            return retorno;
-        } catch (error: any) {
-            log.error(`Erro: ${error}`);
-            throw new CustomError(error.message, 500);
-        }
-    }
-
-    async validarToken(token: string) {
-        try {
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `${token}`
-                }
-            };
-            log.info("Executando a /api/login/validar-token");
-            let response: boolean = await fetch(`${environments.BACK_END}/login/validar-token`, options).then((res) => res.json());
-            return response;
-        } catch (error: any) {
-            log.error(`Erro: ${error}`);
-            throw new CustomError(error.message, 500);
-        }
-    }
-
-    async cadastrarLogin(cadastroLogin: LoginCadastroDto, token: string) {
+    async cadastrarProduto(cadastroproduto: ProdutoCadastroDto, token: string) {
         try {
             const options = {
                 method: 'POST',
@@ -82,14 +20,14 @@ export class LoginService {
                     'Content-Type': 'application/json',
                     'Authorization': `${token}`
                 },
-                body: JSON.stringify(cadastroLogin)
+                body: JSON.stringify(cadastroproduto)
             }
 
-            log.info("Executando a /api/login/cadastrar-login");
-            const res = await fetch(`${environments.BACK_END}/login/cadastrar-login`, options);
+            log.info("Executando a /api/produto/cadastrar-produto");
+            const res = await fetch(`${environments.BACK_END}/produto/cadastrar-produto`, options);
             const status = res.status;
             let retorno: GenericResponseDto = {
-                status, message: status === 201 ? 'Cadastro efetuado com sucesso' : 'Erro ao cadastrar o login'
+                status, message: status === 201 ? 'Cadastro efetuado com sucesso' : 'Erro ao cadastrar o produto'
             };
             return retorno;
         } catch (error: any) {
@@ -98,7 +36,7 @@ export class LoginService {
         }
     }
 
-    async atualizarLogin(atualizacaoLogin: LoginAtualizacaoDto, token: string) {
+    async atualizarProduto(atualizacaoProduto: ProdutoAtualizacaoDto, token: string) {
         try {
             const options = {
                 method: 'PUT',
@@ -106,14 +44,14 @@ export class LoginService {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(atualizacaoLogin)
+                body: JSON.stringify(atualizacaoProduto)
             }
 
-            log.info("Executando a /api/login/atualizar-login");
-            const res = await fetch(`${environments.BACK_END}/login/atualizar-login`, options);
+            log.info("Executando a /api/produto/atualizar-produto");
+            const res = await fetch(`${environments.BACK_END}/produto/atualizar-produto`, options);
             const status = res.status;
             let retorno: GenericResponseDto = {
-                status, message: status === 204 ? 'Login atualizado com sucesso' : 'Erro ao atualizar o login'
+                status, message: status === 204 ? 'Produto atualizado com sucesso' : 'Erro ao atualizar o produto'
             };
             return retorno;
         } catch (error: any) {
@@ -132,14 +70,14 @@ export class LoginService {
                 }
             }
 
-            log.info(`Executando a /api/login/buscar-por-id/${id}`);
-            const res = await fetch(`${environments.BACK_END}/login/buscar-por-id/${id}`, options);
+            log.info("Executando a /api/produto/buscar-por-id/{id}");
+            const res = await fetch(`${environments.BACK_END}/produto/buscar-por-id/${id}`, options);
             const status = res.status;
             let retorno;
             if (status === 204) {
                 retorno = {
                     status: 204,
-                    message: `Usuário não encontrado`
+                    message: `Produto não encontrado`
                 };
             } else if (status === 200) {
                 const response = await res.json();
@@ -160,7 +98,7 @@ export class LoginService {
         }
     }
 
-    async buscarPorPagina (page: string, limit: string, token: string) {
+    async buscarPorPagina(page: string, limit: string, token: string) {
         try {
             const options = {
                 method: 'GET',
@@ -170,8 +108,8 @@ export class LoginService {
                 }
             }
 
-            log.info("Executando a /api/login/listar-todos-por-pagina");
-            const res = await fetch(`${environments.BACK_END}/login/listar-todos-por-pagina?limit=${limit}&page=${page}`, options);
+            log.info("Executando a /api/produto/listar-todos-por-pagina");
+            const res = await fetch(`${environments.BACK_END}/produto/listar-todos-por-pagina?limit=${limit}&page=${page}`, options);
             const status = res.status;
             let retorno;
             if (status === 204) {
@@ -198,7 +136,7 @@ export class LoginService {
         }
     }
 
-    async excluirLogin (id: number, token: string) {
+    async excluirProduto(id: number, token: string) {
         try {
             const options = {
                 method: 'DELETE',
@@ -208,19 +146,19 @@ export class LoginService {
                 }
             }
 
-            log.info("Executando a /api/login/excluir-login");
-            const res = await fetch(`${environments.BACK_END}/login/excluir-login/${id}`, options);
+            log.info("Executando a /api/produto/excluir-produto");
+            const res = await fetch(`${environments.BACK_END}/produto/excluir-produto/${id}`, options);
             const status = res.status;
             let retorno;
             if (status === 204) {
                 retorno = {
                     status: 204,
-                    message: `Usuário excluído com sucesso`
+                    message: `Produto excluído com sucesso`
                 };
             } else {
                 retorno = {
                     status,
-                    message: `Erro ao excluir o login`
+                    message: `Erro ao excluir o produto`
                 };
             }
             return retorno;

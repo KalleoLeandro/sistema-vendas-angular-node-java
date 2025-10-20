@@ -12,3 +12,13 @@ create table usuarios(
 );
 
 insert into usuarios(nome, cpf, login, senha, perfil) values('Master User', '222.333.444-05', 'admin', 'admin', 1);
+
+create table produtos(
+    id int primary key auto_increment,
+    nome varchar(255) not null,
+    preco_custo decimal(6,2) not null,
+    preco_venda decimal(6,2) not null,
+    quantidade int not null,
+    medida int not null,
+    categoria int not null
+);

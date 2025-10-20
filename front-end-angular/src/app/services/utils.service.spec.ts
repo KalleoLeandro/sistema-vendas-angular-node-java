@@ -1,20 +1,21 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { UtilsService } from './utils.service';
 import { environment } from 'environments/environment';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('UtilsService', () => {
   let service: UtilsService;
   let httpMock: HttpTestingController;
-
-  const mockToken = 'mock-token';
-  const mockCpf = '12345678900';
-  const apiUrl = environment.BFF;
+  const baseUrl = environment.BFF;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [UtilsService],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        UtilsService
+      ]
     });
 
     service = TestBed.inject(UtilsService);
@@ -22,39 +23,32 @@ describe('UtilsService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify(); // garante que não há chamadas pendentes
+    httpMock.verify();
   });
 
-  it('deve ser criado', () => {
-    expect(service).toBeTruthy();
-  });
-
-  it('deve fazer uma requisição POST para validar o CPF com token', () => {
+  it('deve chamar validarCpf com método POST', () => {
     const mockResponse = { valido: true };
 
-    service.validarCpf(mockCpf, mockToken).subscribe((res) => {
+    service.validarCpf('12345678900').subscribe(res => {
       expect(res).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/validar-cpf`);
+    const req = httpMock.expectOne(`${baseUrl}/validar-cpf`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('authorization')).toBe(mockToken);
-    expect(req.request.body).toEqual({ cpf: mockCpf });
-
+    expect(req.request.body).toEqual({ cpf: '12345678900' });
     req.flush(mockResponse);
   });
 
-  it('deve tratar erro ao validar CPF', () => {
-    const mockError = { status: 400, statusText: 'Bad Request' };
-
-    service.validarCpf(mockCpf, mockToken).subscribe({
+  it('deve retornar erro ao validarCpf', () => {
+    service.validarCpf('12345678900').subscribe({
+      next: () => fail('Era esperado erro, mas veio sucesso'),
       error: (error) => {
         expect(error.status).toBe(400);
-        expect(error.statusText).toBe('Bad Request');
       }
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/validar-cpf`);
-    req.flush(null, mockError);
+    const req = httpMock.expectOne(`${baseUrl}/validar-cpf`);
+    expect(req.request.method).toBe('POST');
+    req.flush('Erro', { status: 400, statusText: 'Bad Request' });
   });
 });

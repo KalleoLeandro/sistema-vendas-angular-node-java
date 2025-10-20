@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,20 +19,17 @@ import br.com.vendas.vendas.repositories.LoginRepository;
 import br.com.vendas.vendas.services.LoginService;
 import br.com.vendas.vendas.utils.GeralUtils;
 import br.com.vendas.vendas.utils.JwtUtils;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
-
-	@Autowired
-	private LoginRepository loginRepository;
 	
-	@Autowired
-	private GeralUtils geralUtils;
-
-	@Autowired
-	private JwtUtils jwtUtils;
+	private final LoginRepository loginRepository;	
+	private final GeralUtils geralUtils;
+	private final JwtUtils jwtUtils;
 
 	@Override
 	public LoginResponse validarLogin(LoginRequest loginRequest) {
@@ -53,6 +49,7 @@ public class LoginServiceImpl implements LoginService {
 				return response;
 			}
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			logger.error("Erro na execução da validação do login", HttpStatus.INTERNAL_SERVER_ERROR);
 			throw new DefaultErrorException("Erro na execução da validação do login",
 					HttpStatus.INTERNAL_SERVER_ERROR);

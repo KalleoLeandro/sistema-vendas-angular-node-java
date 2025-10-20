@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,16 +33,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Login", description = "Endpoints de login e token")
 @RestController
 @RequestMapping("/login")
+@RequiredArgsConstructor
 public class LoginController {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-	@Autowired
-	private LoginService loginService;
+	
+	private final LoginService loginService;
 
 	@Operation(summary = "Faz login do usuário", description = "Verifica login e senha e retorna o token JWT se for válido")
 	@ApiResponses(value = {
@@ -51,7 +51,6 @@ public class LoginController {
 			@ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))),
 			@ApiResponse(responseCode = "401", description = "Login ou senha inválidos", content = @Content),
 			@ApiResponse(responseCode = "500", description = "Erro interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DefaultErrorResponse.class))) })
-
 	@PostMapping("/validar-login")
 	public ResponseEntity<LoginResponse> validarLogin(@RequestBody @Valid LoginRequest login) {
 		logger.info("Executando a LoginService.validarLogin");
@@ -106,7 +105,7 @@ public class LoginController {
 		return ResponseEntity.status(HttpStatus.OK).body(loginService.buscarPorId(id));
 	}
 	
-	@Operation(summary = "Buscar uma página de logins com base na pagina fornecida", description = "Buscar um login com base em um id fornecido", security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "Buscar uma página de logins com base na pagina fornecida", description = "Buscar uma lista de logins paginada", security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
 			@ApiResponse(
 				    responseCode = "200",

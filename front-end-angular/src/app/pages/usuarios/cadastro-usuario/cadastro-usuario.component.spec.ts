@@ -96,7 +96,7 @@ describe('CadastroUsuarioComponent', () => {
     component.id = 1;
     component.carregarUsuario();
 
-    expect(loginService.buscarUsuarioPorId).toHaveBeenCalledWith(1, jasmine.any(String));
+    expect(loginService.buscarUsuarioPorId).toHaveBeenCalledWith(1);
     expect(component.cadastroForm.controls['nome'].value).toBe('Teste');
   });
 
@@ -172,7 +172,7 @@ describe('CadastroUsuarioComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   
-    expect(loginService.buscarUsuarioPorId).toHaveBeenCalledWith(1, jasmine.any(String));
+    expect(loginService.buscarUsuarioPorId).toHaveBeenCalledWith(1);
   });  
 
   it('não deve validar CPF quando o valor tiver menos de 11 dígitos', () => {

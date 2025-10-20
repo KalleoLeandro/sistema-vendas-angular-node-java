@@ -58,7 +58,7 @@ export class LoginService {
     );
   }
 
-  public buscarUsuarioPorId(id: number | null, token: string): Observable<any> {
+  public buscarUsuarioPorId(id: number | null): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -66,14 +66,14 @@ export class LoginService {
       withCredentials: true
     }
 
-    return this.httpClient.get<Boolean>(`${this.url()}/buscar-por-id/${id}`, httpOptions).pipe(
+    return this.httpClient.get<Boolean>(`${this.url()}/buscar-login-por-id/${id}`, httpOptions).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() => error)
       )
     );
   }
 
-  public atualizarUsuario(formulario: FormGroup<any>, token: string): Observable<any> {
+  public atualizarUsuario(formulario: FormGroup<any>): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export class LoginService {
     );
   }
 
-  public cadastrarUsuario(formulario: FormGroup<any>, token: string): Observable<any> {
+  public cadastrarUsuario(formulario: FormGroup<any>): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export class LoginService {
     );
   }
 
-  public buscarLoginsPorPagina(page: number, limit: number, token: string): Observable<any> {
+  public buscarLoginsPorPagina(page: number, limit: number): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export class LoginService {
       withCredentials: true
     }
 
-    return this.httpClient.get<any>(`${this.url()}/buscar-por-pagina?page=${page}&limit=${limit}`, httpOptions).pipe(
+    return this.httpClient.get<any>(`${this.url()}/buscar-usuarios-por-pagina?page=${page}&limit=${limit}`, httpOptions).pipe(
       catchError((error: HttpErrorResponse) =>
         throwError(() => error)
       )

@@ -29,6 +29,7 @@ export const routes: Routes = [
                 path: 'produtos', children: [
                     { path: 'cadastro',loadComponent: () => import("@pages/produtos/cadastrar-produto/cadastrar-produto.component").then(c => c.CadastrarProdutoComponent) },
                     { path: 'cadastro/:id',loadComponent: () => import("@pages/produtos/cadastrar-produto/cadastrar-produto.component").then(c => c.CadastrarProdutoComponent) },
+                    { path: 'listar',loadComponent: () => import("@pages/produtos/listar-produtos/listar-produtos.component").then(c => c.ListarProdutosComponent) },
                 ]
             }
         ]

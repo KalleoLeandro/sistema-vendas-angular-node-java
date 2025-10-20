@@ -6,11 +6,13 @@ import { TokenMiddleware } from '@middlewares/token-middleware/token.middleware'
 import { MetricsController } from './controllers/metrics/metrics.controller';
 import { LoginService } from './services/login/login.service';
 import { UtilsService } from './services/utils/utils.service';
+import { ProdutoController } from './controllers/produto/produto.controller';
+import { ProdutoService } from './services/produto/produto.service';
 
 @Module({
   imports: [],
-  controllers: [TesteController, LoginController, UtilsController, MetricsController],
-  providers: [LoginService, UtilsService],
+  controllers: [TesteController, LoginController, UtilsController, MetricsController, ProdutoController],
+  providers: [LoginService, UtilsService, ProdutoService],
 })
 export class AppModule {
 

@@ -13,7 +13,7 @@ import { environments } from '@environments/environments';
 import { LoginAtualizacaoDto } from '@models/dto/login-atualizacao-dto';
 import { Logger } from 'winston';
 
-const log:Logger = logger;
+const log: Logger = logger;
 
 
 @Controller()
@@ -124,7 +124,7 @@ export class LoginController {
     })
     @ApiOperation({ summary: 'Endpoint de Cadastro de Login' })
     @ApiResponse({
-        status: 200,
+        status: 201,
         description: 'Cadastro realizado com sucesso',
         schema: {
             example: {}
@@ -155,7 +155,7 @@ export class LoginController {
     @Put('atualizar-login')
     @ApiCookieAuth()
     @ApiBody({
-        description: 'Credenciais criptografadas para autenticação',
+        description: 'Dados do usuário',
         required: true,
         type: LoginAtualizacaoDto,
     })
@@ -189,7 +189,7 @@ export class LoginController {
     }
 
 
-    @Get('buscar-por-id/:id')
+    @Get('buscar-login-por-id/:id')
     @ApiCookieAuth()
     @ApiOperation({ summary: 'Endpoint de retorno de um login por id' })
     @ApiResponse({
@@ -215,22 +215,20 @@ export class LoginController {
         const idBusca: string = id;
         const token: string = req.cookies.jwt;
         const cadastroLogin: any = await this.loginService.buscarPorId(idBusca, token);
-        if (cadastroLogin.status === 200) {
-            res.status(cadastroLogin.status).json(cadastroLogin.response);
-        } else {
-            res.status(cadastroLogin.status).json(cadastroLogin.message);
-        }
+        return res.status(cadastroLogin.status).json(cadastroLogin);
     }
 
-    @Get('buscar-por-pagina')
+    @Get('buscar-usuarios-por-pagina')
     @ApiCookieAuth()
     @ApiOperation({ summary: 'Endpoint de retorno de uma lista paginada de logins ' })
     @ApiResponse({
         status: 200,
         description: 'Login localizado pelo id',
-        type: [
-            LoginCadastroDto
-        ],
+        schema: {
+            example: [{
+                LoginCadastroDto
+            }]
+        },
     })
     @ApiResponse({
         status: 400,
@@ -258,9 +256,9 @@ export class LoginController {
     @ApiResponse({
         status: 204,
         description: 'Login excluido pelo id',
-         schema: {
+        schema: {
             example: {},
-        }        
+        }
     })
     @ApiResponse({
         status: 400,
@@ -279,6 +277,6 @@ export class LoginController {
     async excluirLogin(@Param('id') id: number, @Req() req: Request, @Res() res: Response) {
         const token: string = req.cookies.jwt;
         const retorno = await this.loginService.excluirLogin(id, token);
-        return res.status(retorno.status).json({message: retorno.message});
+        return res.status(retorno.status).json({ message: retorno.message });
     }
 }

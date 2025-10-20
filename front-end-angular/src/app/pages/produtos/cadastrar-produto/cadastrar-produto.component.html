@@ -37,23 +37,23 @@
                 </label>
                 <select class="form-control mt-2" ngModel formControlName="medida">
                     <option value="" selected>--Selecione a medida--</option>
-                    <option *ngFor="let item of medida; let i = index" [value]="item">{{item}}</option>
+                    <option *ngFor="let item of medida; let i = index" [value]="item.id">{{item.descricao}}</option>
                 </select>
                 <label>
                     Categoria
                 </label>
                 <select class="form-control mt-3" ngModel formControlName="categoria">
                     <option value="" selected>--Selecione a categoria--</option>
-                    <option *ngFor="let item of categoria; let i = index" [value]="item">{{item}}</option>
+                    <option *ngFor="let item of categoria; let i = index" [value]="item.id">{{item.descricao}}</option>
                 </select>
                 <div class="botoes mt-5 mb-3">
 
-                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid">Cadastrar</button>
+                    <button class="btn btn-primary" [disabled]="cadastroForm.invalid" (click)="cadastrarAtualizarProduto()">Cadastrar</button>
                     <button class="btn btn-warning" (click)="$event.preventDefault(); limparFormulario()">Limpar
                         Formulário</button>
                 </div>
                 <div id="modal">
-                    <button type="button" id="botaoModal" data-toggle="modal" data-target="#modalConfirmacao">
+                    <button type="button" id="botaoModal" data-bs-toggle="modal" data-bs-target="#modalConfirmacao">
                     </button>
                 </div>
             </form>

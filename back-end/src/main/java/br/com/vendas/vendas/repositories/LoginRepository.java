@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -20,14 +19,16 @@ import br.com.vendas.vendas.models.dto.LoginDTO;
 import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
 import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
 import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
+import lombok.RequiredArgsConstructor;
 
 @Repository
+@RequiredArgsConstructor
 public class LoginRepository {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginRepository.class);
 
-	@Autowired
-	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	
+	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	final RowMapper<LoginDTO> loginMapper = (rs, rowNum) -> LoginDTO.builder().nome(rs.getString("nome"))
 			.cpf(rs.getString("cpf")).perfil(rs.getString("perfil")).build();

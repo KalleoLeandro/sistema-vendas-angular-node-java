@@ -37,7 +37,9 @@ import br.com.vendas.vendas.utils.JwtUtils;
 @SpringBootTest
 @TestPropertySource(properties = { "jwt.token.validity=10000", "secret.jwt.secret=myTestSecretKey" })
 @ActiveProfiles("test")
-class LoginServiceImplTest {
+class LoginServiceImplTest {	
+	@InjectMocks
+	private LoginServiceImpl loginService;
 
 	@Mock
 	private LoginRepository loginRepository;
@@ -45,14 +47,14 @@ class LoginServiceImplTest {
 	@Mock
 	private JwtUtils jwtUtils;
 
-	@InjectMocks
-	private LoginServiceImpl loginService;
-
 	@Mock
 	private GeralUtils geralUtils;
 
 	private LoginCadastroResponse loginCadastroResponse;
+	
+	private CadastroLoginRequest cadastroLoginRequest;
 
+	private AtualizacaoLoginRequest atualizacaoLoginRequest;
 	@BeforeEach
 	public void setup() {
 		loginCadastroResponse = new LoginCadastroResponse();
@@ -61,13 +63,17 @@ class LoginServiceImplTest {
 		loginCadastroResponse.setCpf("22233344405");
 		loginCadastroResponse.setLogin("user");		
 		loginCadastroResponse.setPerfil("dev");
+		
+		cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05",
+				"teste_user", "123456", "dev");
+		
+		atualizacaoLoginRequest = new AtualizacaoLoginRequest(1, "teste", "123.456.789-00",
+				"teste_user", "123456", "dev");
+		
+		loginService = new LoginServiceImpl(loginRepository, geralUtils, jwtUtils);
 	}
 
-	private CadastroLoginRequest cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05",
-			"teste_user", "123456", "dev");
-
-	private AtualizacaoLoginRequest atualizacaoLoginRequest = new AtualizacaoLoginRequest(1, "teste", "123.456.789-00",
-			"teste_user", "123456", "dev");
+	
 
 	@BeforeEach
 	void setUp() {

@@ -27,18 +27,18 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import br.com.vendas.vendas.exceptions.DefaultErrorException;
-import br.com.vendas.vendas.models.dto.LoginDTO;
-import br.com.vendas.vendas.models.requests.AtualizacaoLoginRequest;
-import br.com.vendas.vendas.models.requests.CadastroLoginRequest;
+import br.com.vendas.vendas.models.requests.AtualizacaoProdutoRequest;
+import br.com.vendas.vendas.models.requests.CadastroProdutoRequest;
 import br.com.vendas.vendas.models.responses.LoginCadastroResponse;
+import br.com.vendas.vendas.models.responses.ProdutoCadastroResponse;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
-class LoginRepositoryTest {
+public class ProdutoRepositoryTest {
 
 	@InjectMocks
-	private LoginRepository loginRepository;
+	private ProdutoRepository produtoRepository;
 
 	@Mock
 	private DataSource dataSource;
@@ -46,93 +46,39 @@ class LoginRepositoryTest {
 	@Mock
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	private CadastroLoginRequest cadastroLoginRequest;
+	private CadastroProdutoRequest cadastroProdutoRequest;
 
-	private AtualizacaoLoginRequest atualizacaoLoginRequest;
+	private AtualizacaoProdutoRequest atualizacaoProdutoRequest;
 
 	@BeforeEach
-	void setUp() {
+	void setup() {
 		MockitoAnnotations.openMocks(this);
+
+		cadastroProdutoRequest = new CadastroProdutoRequest();
+		cadastroProdutoRequest.setNome("Teste");
+		cadastroProdutoRequest.setPrecoCusto(1.0);
+		cadastroProdutoRequest.setPrecoVenda(2.0);
+		cadastroProdutoRequest.setQuantidade(1);
+		cadastroProdutoRequest.setMedida(1);
+		cadastroProdutoRequest.setCategoria(1);
+
+		atualizacaoProdutoRequest = new AtualizacaoProdutoRequest();
+		atualizacaoProdutoRequest.setId(1);
+		atualizacaoProdutoRequest.setPrecoCusto(1.0);
+		atualizacaoProdutoRequest.setPrecoVenda(2.0);
+		atualizacaoProdutoRequest.setQuantidade(1);
+		atualizacaoProdutoRequest.setMedida(1);
+		atualizacaoProdutoRequest.setCategoria(1);
 		
-		cadastroLoginRequest = new CadastroLoginRequest("teste", "222.333.444-05",
-				"teste_user", "123456", "dev");
-		
-		atualizacaoLoginRequest = new AtualizacaoLoginRequest(1, "teste", "123.456.789-00",
-				"teste_user", "123456", "dev");
-		
-		loginRepository = new LoginRepository(namedParameterJdbcTemplate);
+		produtoRepository = new ProdutoRepository(namedParameterJdbcTemplate);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
-	void testBuscarPorLoginESenha_Success() throws Exception {
-		String login = "usuario-teste";
-		String senha = "123";
-
-		Mockito.doAnswer(invocation -> {
-			RowMapper<LoginDTO> rowMapper = invocation.getArgument(2);
-
-			ResultSet rs = Mockito.mock(ResultSet.class);
-			Mockito.when(rs.getString("nome")).thenReturn("Nome Teste");
-			Mockito.when(rs.getString("cpf")).thenReturn("12345678901");
-			Mockito.when(rs.getString("perfil")).thenReturn("user");
-
-			return rowMapper.mapRow(rs, 1);
-		}).when(namedParameterJdbcTemplate).queryForObject(Mockito.anyString(),
-				Mockito.any(MapSqlParameterSource.class), Mockito.any(RowMapper.class));
-
-		LoginDTO result = loginRepository.buscarPorLoginESenha(login, senha);
-
-		Assertions.assertNotNull(result);
-		Assertions.assertEquals("Nome Teste", result.getNome());
-		Assertions.assertEquals("12345678901", result.getCpf());
-		Assertions.assertEquals("user", result.getPerfil());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	void testBuscarPorLoginESenha_NotFound() {
-		String login = "usuario-invalido";
-		String senha = "senha-invalida";
-
-		Mockito.when(namedParameterJdbcTemplate.queryForObject(Mockito.anyString(),
-				Mockito.any(MapSqlParameterSource.class), Mockito.any(RowMapper.class)))
-				.thenThrow(EmptyResultDataAccessException.class);
-
-		LoginDTO result = loginRepository.buscarPorLoginESenha(login, senha);
-
-		Assertions.assertNull(result);
-
-		Mockito.verify(namedParameterJdbcTemplate).queryForObject(Mockito.anyString(),
-				Mockito.any(MapSqlParameterSource.class), Mockito.any(RowMapper.class));
-	}
-
-	@SuppressWarnings({ "unchecked", "serial" })
-	@Test
-	void testBuscarPorLoginESenha_Exception() {
-		String login = "usuario-teste";
-		String senha = "123";
-		String sql = "SELECT nome, cpf, perfil FROM usuarios WHERE login = :login AND senha = :senha";
-
-		Mockito.when(namedParameterJdbcTemplate.queryForObject(Mockito.eq(sql),
-				Mockito.any(MapSqlParameterSource.class), Mockito.any(RowMapper.class)))
-				.thenThrow(new DataAccessException("...") {
-				});
-
-		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
-			loginRepository.buscarPorLoginESenha(login, senha);
-		});
-
-		Assertions.assertEquals("Erro ao consultar os dados na base", ex.getMessage());
-		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
-	}
-
-	@Test
-	void testCadastrarLogin_Success() throws Exception {
+	void testCadastrarProduto_Success() throws Exception {
 		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
 				.thenReturn(1);
 
-		loginRepository.cadastrarLogin(cadastroLoginRequest);
+		produtoRepository.cadastrarProduto(cadastroProdutoRequest);
 
 		Mockito.verify(namedParameterJdbcTemplate).update(Mockito.anyString(),
 				Mockito.any(MapSqlParameterSource.class));
@@ -140,14 +86,14 @@ class LoginRepositoryTest {
 
 	@SuppressWarnings("serial")
 	@Test
-	void testCadastrarLogin_Exception() {
+	void testCadastrarProduto_Exception() {
 
 		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
 				.thenThrow(new DataAccessException("...") {
 				});
 
 		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
-			loginRepository.cadastrarLogin(cadastroLoginRequest);
+			produtoRepository.cadastrarProduto(cadastroProdutoRequest);
 		});
 
 		Assertions.assertEquals("Erro ao gravar os dados na base", ex.getMessage());
@@ -155,12 +101,12 @@ class LoginRepositoryTest {
 	}
 
 	@Test
-	void testAtualizarLogin_Success() throws Exception {
+	void testAtualizarProduto_Success() throws Exception {
 
 		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
 				.thenReturn(1);
 
-		loginRepository.atualizarLogin(atualizacaoLoginRequest);
+		produtoRepository.atualizarProduto(atualizacaoProdutoRequest);
 
 		Mockito.verify(namedParameterJdbcTemplate).update(Mockito.anyString(),
 				Mockito.any(MapSqlParameterSource.class));
@@ -175,7 +121,7 @@ class LoginRepositoryTest {
 				});
 
 		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
-			loginRepository.atualizarLogin(atualizacaoLoginRequest);
+			produtoRepository.atualizarProduto(atualizacaoProdutoRequest);
 		});
 
 		Assertions.assertEquals("Erro ao gravar os dados na base", ex.getMessage());
@@ -191,22 +137,27 @@ class LoginRepositoryTest {
 			ResultSet rs = Mockito.mock(ResultSet.class);
 			Mockito.when(rs.getInt("id")).thenReturn(2);
 			Mockito.when(rs.getString("nome")).thenReturn("Nome Teste");
-			Mockito.when(rs.getString("cpf")).thenReturn("12345678901");
-			Mockito.when(rs.getString("login")).thenReturn("teste");			
-			Mockito.when(rs.getString("perfil")).thenReturn("user");
+			Mockito.when(rs.getDouble("preco_custo")).thenReturn(12.0);
+			Mockito.when(rs.getDouble("preco_venda")).thenReturn(15.0);
+			Mockito.when(rs.getInt("quantidade")).thenReturn(1);
+			Mockito.when(rs.getInt("medida")).thenReturn(1);
+			Mockito.when(rs.getInt("categoria")).thenReturn(1);
+			
 
 			return rowMapper.mapRow(rs, 1);
 		}).when(namedParameterJdbcTemplate).queryForObject(Mockito.anyString(),
 				Mockito.any(MapSqlParameterSource.class), Mockito.any(RowMapper.class));
 
-		LoginCadastroResponse result = loginRepository.buscarPorId(2);
+		ProdutoCadastroResponse result = produtoRepository.buscarPorId(2);
 
 		Assertions.assertNotNull(result);
 		Assertions.assertEquals(2, result.getId());
 		Assertions.assertEquals("Nome Teste", result.getNome());
-		Assertions.assertEquals("12345678901", result.getCpf());
-		Assertions.assertEquals("teste", result.getLogin());		
-		Assertions.assertEquals("user", result.getPerfil());
+		Assertions.assertEquals(12.0, result.getPrecoCusto());
+		Assertions.assertEquals(15.0, result.getPrecoVenda());		
+		Assertions.assertEquals(1, result.getQuantidade());
+		Assertions.assertEquals(1, result.getQuantidade());
+		Assertions.assertEquals(1, result.getQuantidade());
 	}
 	
 	@SuppressWarnings({ "unchecked", "serial" })
@@ -217,7 +168,7 @@ class LoginRepositoryTest {
 				Mockito.any(RowMapper.class))).thenThrow(new EmptyResultDataAccessException("...", 404) {}) ;
 				
 		EmptyResultDataAccessException ex = Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
-			loginRepository.buscarPorId(2);
+			produtoRepository.buscarPorId(2);
 		});
 
 		Assertions.assertEquals("Erro ao localizar os dados na base", ex.getMessage());
@@ -232,7 +183,7 @@ class LoginRepositoryTest {
 				Mockito.any(RowMapper.class))).thenThrow(new DataAccessException("...") {}) ;
 				
 		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
-			loginRepository.buscarPorId(2);
+			produtoRepository.buscarPorId(2);
 		});
 
 		Assertions.assertEquals("Erro ao localizar os dados na base", ex.getMessage());
@@ -242,15 +193,17 @@ class LoginRepositoryTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void testListaPorPagina_Success() throws Exception {
-	    LoginCadastroResponse mockResponse = LoginCadastroResponse.builder()
-	        .id(2)
-	        .nome("Nome Teste")
-	        .cpf("12345678901")
-	        .login("teste")	        
-	        .perfil("user")
-	        .build();
+		ProdutoCadastroResponse loginMock = ProdutoCadastroResponse.builder()
+				.id(2)
+				.nome("Nome Teste")
+				.precoCusto(10.0)
+				.precoVenda(12.0)				
+				.quantidade(1)
+				.medida(1)
+				.categoria(1)
+				.build();
 
-	    List<LoginCadastroResponse> mockList = List.of(mockResponse);
+	    List<ProdutoCadastroResponse> mockList = List.of(loginMock);
 
 	    Mockito.when(namedParameterJdbcTemplate.query(
 	        Mockito.anyString(),
@@ -264,10 +217,10 @@ class LoginRepositoryTest {
 		        Mockito.eq(Integer.class)
 		    )).thenReturn(5);
 
-	    Map<String, Object> result = loginRepository.listarPorPagina(10, 1);
+	    Map<String, Object> result = produtoRepository.listarPorPagina(10, 1);
 
 	    Assertions.assertNotNull(result);
-	    List<LoginCadastroResponse> lista = (List<LoginCadastroResponse>) result.get("lista");
+	    List<ProdutoCadastroResponse> lista = (List<ProdutoCadastroResponse>) result.get("lista");
 	    Assertions.assertEquals(2, lista.get(0).getId());	    
 	}
 	
@@ -280,7 +233,7 @@ class LoginRepositoryTest {
 	        Mockito.any(RowMapper.class)
 	    )).thenReturn(Collections.emptyList());
 
-	    Map<String, Object> result = loginRepository.listarPorPagina(10, 1);
+	    Map<String, Object> result = produtoRepository.listarPorPagina(10, 1);
 
 	    Assertions.assertNotNull(result);
 	    Assertions.assertTrue(((List<?>) result.get("lista")).isEmpty(), "A lista deve estar vazia");
@@ -296,7 +249,7 @@ class LoginRepositoryTest {
 	    )).thenThrow(new DataAccessResourceFailureException("Erro simulado"));
 
 	    DefaultErrorException exception = Assertions.assertThrows(DefaultErrorException.class, () -> {
-	        loginRepository.listarPorPagina(10, 1);
+	        produtoRepository.listarPorPagina(10, 1);
 	    });
 
 	    Assertions.assertEquals("Erro ao localizar os dados na base", exception.getMessage());
@@ -312,7 +265,7 @@ class LoginRepositoryTest {
 	    )).thenThrow(new EmptyResultDataAccessException("Erro simulado", 1));
 
 	    EmptyResultDataAccessException exception = Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
-	        loginRepository.listarPorPagina(10, 1);
+	        produtoRepository.listarPorPagina(10, 1);
 	    });
 
 	    Assertions.assertEquals("Sem items retornados", exception.getMessage());
@@ -322,7 +275,7 @@ class LoginRepositoryTest {
 	void testExcluirLogin_Success() throws Exception {
 		Mockito.when(namedParameterJdbcTemplate.update(Mockito.anyString(), Mockito.any(MapSqlParameterSource.class)))
 		.thenReturn(1);
-		loginRepository.excluirLogin(1);
+		produtoRepository.excluirProduto(1);
 
 		Mockito.verify(namedParameterJdbcTemplate).update(Mockito.anyString(),
 				Mockito.any(MapSqlParameterSource.class));
@@ -337,10 +290,11 @@ class LoginRepositoryTest {
 				});
 
 		DefaultErrorException ex = Assertions.assertThrows(DefaultErrorException.class, () -> {
-			loginRepository.excluirLogin(1);
+			produtoRepository.excluirProduto(1);
 		});
 
 		Assertions.assertEquals("Erro ao excluir o dado na base", ex.getMessage());
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatus());
 	}
+
 }
